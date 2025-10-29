@@ -1,4 +1,4 @@
-/* danielantunes15/sistema_barbearia/sistema_barbearia-197d2932e7e3d39489bf9472ce2a71471b9e3a99/script.js */
+/* danielantunes15/sistema_barbearia/sistema_barbearia-b0067c03d237e0e4549e5b3d1f68679361eb7104/script.js */
 
 // Função para formatar CPF
 function formatarCPF(campo) {
@@ -69,7 +69,6 @@ async function checkAuth() {
     
     return null;
 }
-
 
 // Tabs no login
 function showTab(tab) {
@@ -328,6 +327,7 @@ if (document.getElementById('barbeiroNome')) {
              console.log('Cliente acessou página de barbeiro, redirecionando...');
              window.location.href = 'dashboard-cliente.html';
         } else {
+            console.log('Barbeiro não autenticado, redirecionando...');
             window.location.href = 'index.html';
         }
     })();
@@ -506,6 +506,74 @@ function showFallbackQRCode(userId, container) {
         </div>
     `;
     container.style.height = 'auto';
+}
+
+// QR Code - SOLUÇÃO DEFINITIVA
+function initializeQRCode() {
+    const qrcodeContainer = document.getElementById('qrcode');
+    if (!qrcodeContainer) return;
+
+    // Verifica se estamos na página de QR Code
+    if (!window.location.href.includes('qrcode.html')) return;
+
+    // Função para gerar QR Code
+    async function generateQRCode() {
+        const auth = await checkAuth();
+        
+        if (auth && auth.tipo === 'cliente') {
+            const user = auth.data;
+            document.getElementById('userId').textContent = user.id;
+            
+            // Verifica se a biblioteca QRCode está disponível
+            if (typeof QRCode === 'undefined') {
+                console.warn('QRCode library not available, showing fallback');
+                showFallbackQRCode(user.id, qrcodeContainer);
+                return;
+            }
+            
+            try {
+                // Limpa o container
+                qrcodeContainer.innerHTML = '';
+                
+                // Cria um canvas para o QR Code
+                const canvas = document.createElement('canvas');
+                qrcodeContainer.appendChild(canvas);
+                
+                // Gera o QR Code usando a biblioteca
+                QRCode.toCanvas(canvas, user.id, {
+                    width: 250,
+                    margin: 2,
+                    color: {
+                        dark: '#000000',
+                        light: '#FFFFFF'
+                    }
+                }, function(error) {
+                    if (error) {
+                        console.error('Erro ao gerar QR Code:', error);
+                        showFallbackQRCode(user.id, qrcodeContainer);
+                        return;
+                    }
+                    
+                    // Aplica estilos ao canvas
+                    canvas.style.border = '2px solid #444';
+                    canvas.style.borderRadius = '15px';
+                    canvas.style.padding = '15px';
+                    canvas.style.background = 'white';
+                    canvas.style.maxWidth = '100%';
+                });
+                
+            } catch (error) {
+                console.error('Erro geral ao gerar QR Code:', error);
+                showFallbackQRCode(user.id, qrcodeContainer);
+            }
+        } else {
+            // Se não for cliente ou não autenticado, redireciona
+            window.location.href = 'index.html';
+        }
+    }
+
+    // Tenta gerar o QR Code imediatamente
+    generateQRCode();
 }
 
 // Scanner (Async onScanSuccess)
@@ -774,63 +842,16 @@ document.addEventListener('DOMContentLoaded', function() {
         checkAuth(); // Verifica se está logado em index.html ou cadastro.html para redirecionar
     }
     
-    const dataNascimentoInput = document.getElementById('dataNascimento');
-    if (dataNascimentoInput) {
-        const hoje = new Date();
-        const ano = hoje.getFullYear();
-        const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-        const dia = String(hoje.getDate()).padStart(2, '0');
-        dataNascimentoInput.max = `${ano}-${mes}-${dia}`;
-        
-        const anoMin = ano - 100;
-        dataNascimentoInput.min = `${anoMin}-${mes}-${dia}`;
-    }
-    
-    // CORREÇÃO: QR Code (Async IIFE) - Movido aqui para garantir que 'QRCode' esteja definido
-    if (document.getElementById('qrcode')) {
-        (async () => {
-            const auth = await checkAuth();
-            
-            if (auth && auth.tipo === 'cliente') {
-                const user = auth.data;
-                document.getElementById('userId').textContent = user.id;
-                
-                const qrcodeContainer = document.getElementById('qrcode');
-                
-                try {
-                    // Usar toDataURL para gerar uma imagem
-                    QRCode.toDataURL(user.id, {
-                        width: 250, // Aumentado para melhor visualização
-                        margin: 2,
-                        color: { dark: '#000000', light: '#FFFFFF' }
-                    }, function(err, url) {
-                        if (err) {
-                            console.error('Erro ao gerar QR Code como Data URL:', err);
-                            showFallbackQRCode(user.id, qrcodeContainer);
-                            return;
-                        }
-                        // Limpa o container e insere a imagem
-                        qrcodeContainer.innerHTML = ''; 
-                        const img = document.createElement('img');
-                        img.src = url;
-                        // Aplicando estilos para visualização "bonita" (borda, fundo branco, padding)
-                        img.style.border = '2px solid #444';
-                        img.style.borderRadius = '15px';
-                        img.style.padding = '15px';
-                        img.style.background = 'white';
-                        img.style.maxWidth = '100%'; // Garantir responsividade
+    // Formatação de CPF
+    const cpfInputs = document.querySelectorAll('input[data-cpf]');
+    cpfInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            formatarCPF(this);
+        });
+    });
 
-                        qrcodeContainer.appendChild(img);
-                    });
-                } catch (error) {
-                    console.error('Erro geral ao gerar QR Code:', error);
-                    showFallbackQRCode(user.id, qrcodeContainer);
-                }
-            } else {
-                window.location.href = 'index.html';
-            }
-        })();
-    }
+    // Inicializa o QR Code após o DOM estar completamente carregado
+    initializeQRCode();
     
     console.log('Sistema de Barbearia (Supabase) inicializado.');
 });
