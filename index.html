@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barbearia - Login</title>
+    <title>Barbearia - Login Cliente</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,24 +13,45 @@
             <p>Programa de Fidelidade</p>
         </div>
         
-        <form id="loginForm" class="form">
-            <h2>Login</h2>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('cliente')">Cliente</button>
+            <button class="tab-btn" onclick="showTab('barbeiro')">Barbeiro</button>
+        </div>
+        
+        <form id="loginClienteForm" class="form active">
+            <h2>Login Cliente</h2>
             
             <div class="input-group">
-                <label for="email">E-mail</label>
-                <input type="email" id="email" required>
+                <label for="emailCliente">E-mail</label>
+                <input type="email" id="emailCliente" required>
             </div>
             
             <div class="input-group">
-                <label for="password">Senha</label>
-                <input type="password" id="password" required>
+                <label for="passwordCliente">Senha</label>
+                <input type="password" id="passwordCliente" required>
             </div>
             
-            <button type="submit" class="btn">Entrar</button>
+            <button type="submit" class="btn">Entrar como Cliente</button>
             
             <p class="link">
                 Não tem uma conta? <a href="cadastro.html">Cadastre-se</a>
             </p>
+        </form>
+        
+        <form id="loginBarbeiroForm" class="form">
+            <h2>Login Barbeiro</h2>
+            
+            <div class="input-group">
+                <label for="emailBarbeiro">E-mail</label>
+                <input type="email" id="emailBarbeiro" required>
+            </div>
+            
+            <div class="input-group">
+                <label for="passwordBarbeiro">Senha</label>
+                <input type="password" id="passwordBarbeiro" required>
+            </div>
+            
+            <button type="submit" class="btn btn-barbeiro">Entrar como Barbeiro</button>
         </form>
     </div>
     

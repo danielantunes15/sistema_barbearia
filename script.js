@@ -115,16 +115,45 @@ if (document.getElementById('qrcode')) {
     if (user) {
         document.getElementById('userId').textContent = user.id;
         
-        // Gerar QR Code
-        QRCode.toCanvas(document.getElementById('qrcode'), user.id, {
-            width: 200,
-            height: 200,
-            colorDark: '#000000',
-            colorLight: '#ffffff',
-        }, function(error) {
-            if (error) console.error(error);
-        });
+        // Gerar QR Code usando a biblioteca QRCode.js
+        const qrcodeContainer = document.getElementById('qrcode');
+        
+        try {
+            QRCode.toCanvas(qrcodeContainer, user.id, {
+                width: 200,
+                margin: 2,
+                color: {
+                    dark: '#000000',
+                    light: '#FFFFFF'
+                }
+            }, function(error) {
+                if (error) {
+                    console.error(error);
+                    showFallbackQRCode(user.id, qrcodeContainer);
+                }
+            });
+        } catch (error) {
+            console.error('Erro ao gerar QR Code:', error);
+            showFallbackQRCode(user.id, qrcodeContainer);
+        }
     }
+}
+
+// Função fallback para mostrar QR Code
+function showFallbackQRCode(userId, container) {
+    container.innerHTML = `
+        <div style="text-align: center; padding: 20px;">
+            <div style="background: white; padding: 20px; border-radius: 10px; border: 2px solid #ddd; display: inline-block;">
+                <h3 style="color: #333; margin-bottom: 15px;">ID do Usuário</h3>
+                <div style="font-size: 18px; font-weight: bold; background: #f8f9fa; padding: 15px; border-radius: 5px; letter-spacing: 2px;">
+                    ${userId}
+                </div>
+            </div>
+            <p style="color: #666; margin-top: 15px;">
+                Mostre este código ao barbeiro caso o QR Code não funcione
+            </p>
+        </div>
+    `;
 }
 
 // Scanner
@@ -147,6 +176,7 @@ if (document.getElementById('reader')) {
             onScanFailure
         ).catch(err => {
             console.error(err);
+            alert('Erro ao iniciar a câmera. Verifique as permissões.');
         });
     });
     

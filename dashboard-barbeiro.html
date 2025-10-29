@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barbearia - Dashboard Barbeiro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Dashboard Barbeiro</h1>
+            <div>
+                <span id="barbeiroNome" style="margin-right: 15px;"></span>
+                <button id="logoutBtn" class="btn-secondary">Sair</button>
+            </div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h4>Total Clientes</h4>
+                <div class="stat-number" id="totalClientes">0</div>
+            </div>
+            <div class="stat-card">
+                <h4>Cortes Hoje</h4>
+                <div class="stat-number" id="cortesHoje">0</div>
+            </div>
+            <div class="stat-card">
+                <h4>Cortes Mês</h4>
+                <div class="stat-number" id="cortesMes">0</div>
+            </div>
+            <div class="stat-card">
+                <h4>Fidelidades</h4>
+                <div class="stat-number" id="totalFidelidades">0</div>
+            </div>
+        </div>
+        
+        <div class="actions">
+            <a href="scanner.html" class="btn">Escanear QR Code</a>
+            <a href="relatorios.html" class="btn btn-secondary">Relatórios</a>
+        </div>
+        
+        <div class="card">
+            <h3>Clientes Próximos da Fidelidade (8+ pontos)</h3>
+            <div id="clientesProximos" class="clientes-lista">
+                <!-- Lista de clientes próximos -->
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3>Todos os Clientes</h3>
+            <div class="search-bar">
+                <input type="text" id="searchClient" placeholder="Buscar cliente...">
+            </div>
+            <div id="todosClientes" class="clientes-lista">
+                <!-- Lista de todos os clientes -->
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3>Estatísticas de Frequência</h3>
+            <div id="estatisticasFrequencia" class="stats-container">
+                <!-- Estatísticas de frequência -->
+            </div>
+        </div>
+    </div>
+    
+    <script src="db.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

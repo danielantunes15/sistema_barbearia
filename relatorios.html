@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barbearia - Relatórios</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Relatórios</h1>
+            <a href="dashboard-barbeiro.html" class="btn-secondary">Voltar</a>
+        </div>
+        
+        <div class="card">
+            <h3>Filtros</h3>
+            <div class="filters">
+                <select id="periodo">
+                    <option value="hoje">Hoje</option>
+                    <option value="semana">Esta Semana</option>
+                    <option value="mes" selected>Este Mês</option>
+                    <option value="trimestre">Este Trimestre</option>
+                    <option value="ano">Este Ano</option>
+                </select>
+                <input type="date" id="dataInicio">
+                <input type="date" id="dataFim">
+                <button id="aplicarFiltro" class="btn">Aplicar</button>
+            </div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card large">
+                <h4>Clientes Mais Frequentes</h4>
+                <div id="clientesFrequentes" class="ranking-list">
+                    <!-- Ranking de clientes frequentes -->
+                </div>
+            </div>
+            
+            <div class="stat-card large">
+                <h4>Horários Mais Movimentados</h4>
+                <div id="horariosMovimento" class="horarios-list">
+                    <!-- Horários de pico -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3>Relatório de Cortes</h3>
+            <div id="relatorioCortes" class="relatorio-container">
+                <!-- Relatório detalhado -->
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3>Exportar Dados</h3>
+            <div class="actions">
+                <button id="exportClientes" class="btn">Exportar Lista de Clientes</button>
+                <button id="exportCortes" class="btn btn-secondary">Exportar Histórico de Cortes</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="db.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
