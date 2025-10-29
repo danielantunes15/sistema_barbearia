@@ -855,3 +855,181 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Sistema de Barbearia (Supabase) inicializado.');
 });
+
+// ===============================================
+// LÓGICA PARA gerenciar-usuarios.html
+// ===============================================
+
+// Função para trocar abas no painel de gerenciamento
+function showManagementTab(tab) {
+    document.querySelectorAll('.management-tab').forEach(t => t.style.display = 'none');
+    document.querySelectorAll('.tabs .tab-btn').forEach(b => b.classList.remove('active'));
+    
+    if (tab === 'clientes') {
+        document.getElementById('tabClientes').style.display = 'block';
+        document.querySelectorAll('.tabs .tab-btn')[0].classList.add('active');
+    } else {
+        document.getElementById('tabBarbeiros').style.display = 'block';
+        document.querySelectorAll('.tabs .tab-btn')[1].classList.add('active');
+    }
+}
+
+// IIFE para carregar dados na página de gerenciamento
+if (document.getElementById('managementPage')) {
+    (async () => {
+        // 1. Verificar se é um barbeiro logado
+        const auth = await checkAuth();
+        if (!auth || auth.tipo !== 'barbeiro') {
+            alert('Acesso negado.');
+            window.location.href = 'index.html';
+            return;
+        }
+        
+        console.log('Carregando Painel de Gerenciamento...');
+        
+        // 2. Carregar listas
+        await loadManagementLists();
+        
+        // 3. Adicionar listener para criar cliente
+        document.getElementById('adminCreateClienteForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nome = document.getElementById('adminNomeCliente').value;
+            const cpf = document.getElementById('adminCpfCliente').value.replace(/\D/g, '');
+            const email = document.getElementById('adminEmailCliente').value;
+            const dataNascimento = document.getElementById('adminNascCliente').value;
+            const password = document.getElementById('adminSenhaCliente').value;
+            
+            if (!nome || !cpf || !email || !dataNascimento || !password) {
+                alert('Preencha todos os campos!');
+                return;
+            }
+            if (password.length < 6) {
+                alert('A senha deve ter pelo menos 6 caracteres.');
+                return;
+            }
+            if (await emailOrCpfExists(email, cpf)) {
+                alert('Este CPF ou E-mail já está cadastrado!');
+                return;
+            }
+            
+            const hashedPassword = hashPassword(password);
+            const newUser = {
+                id: 'user_' + Date.now(),
+                nome, cpf, email, dataNascimento, password: hashedPassword,
+                pontos: 0, historico: [], dataCadastro: new Date().toISOString()
+            };
+            
+            const created = await createNewUser(newUser);
+            if (created) {
+                alert('Cliente cadastrado com sucesso!');
+                e.target.reset();
+                await loadManagementLists();
+            } else {
+                alert('Erro ao cadastrar cliente.');
+            }
+        });
+        
+        // 4. Adicionar listener para criar barbeiro
+        document.getElementById('adminCreateBarbeiroForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nome = document.getElementById('adminNomeBarbeiro').value;
+            const email = document.getElementById('adminEmailBarbeiro').value;
+            const password = document.getElementById('adminSenhaBarbeiro').value;
+
+            if (!nome || !email || !password) {
+                alert('Preencha todos os campos!');
+                return;
+            }
+            if (password.length < 6) {
+                alert('A senha deve ter pelo menos 6 caracteres.');
+                return;
+            }
+
+            const hashedPassword = hashPassword(password);
+            const newBarbeiro = {
+                id: 'barbeiro_' + Date.now(),
+                nome, email, password: hashedPassword,
+                dataCadastro: new Date().toISOString()
+            };
+
+            const created = await createNewBarbeiro(newBarbeiro);
+            if (created) {
+                alert('Barbeiro cadastrado com sucesso!');
+                e.target.reset();
+                await loadManagementLists();
+            } else {
+                alert('Erro ao cadastrar barbeiro.');
+            }
+        });
+
+    })();
+}
+
+// Função para carregar e recarregar as listas de usuários e barbeiros
+async function loadManagementLists() {
+    const listaClientes = document.getElementById('listaClientes');
+    const listaBarbeiros = document.getElementById('listaBarbeiros');
+    
+    if (!listaClientes || !listaBarbeiros) return;
+
+    listaClientes.innerHTML = 'Carregando...';
+    listaBarbeiros.innerHTML = 'Carregando...';
+
+    // Carregar Clientes
+    const users = await getAllUsers();
+    listaClientes.innerHTML = '';
+    users.forEach(user => {
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        item.innerHTML = `
+            <div class="list-item-info">
+                <h4>${user.nome}</h4>
+                <p>CPF: ${user.cpf} | Email: ${user.email}</p>
+                <p>Pontos: ${user.pontos} | Cortes: ${user.historico ? user.historico.length : 0}</p>
+            </div>
+            <button class="btn-delete" data-id="${user.id}" data-tipo="user">Excluir</button>
+        `;
+        listaClientes.appendChild(item);
+    });
+
+    // Carregar Barbeiros
+    const barbeiros = await getAllBarbeiros();
+    listaBarbeiros.innerHTML = '';
+    barbeiros.forEach(barb => {
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        item.innerHTML = `
+            <div class="list-item-info">
+                <h4>${barb.nome}</h4>
+                <p>Email: ${barb.email}</p>
+            </div>
+            <button class="btn-delete" data-id="${barb.id}" data-tipo="barbeiro">Excluir</button>
+        `;
+        listaBarbeiros.appendChild(item);
+    });
+    
+    // Adicionar listeners aos botões de exclusão
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const id = e.target.dataset.id;
+            const tipo = e.target.dataset.tipo;
+            const nome = e.target.previousElementSibling.querySelector('h4').textContent;
+
+            if (confirm(`Tem certeza que deseja excluir "${nome}"? Esta ação não pode ser desfeita.`)) {
+                let success = false;
+                if (tipo === 'user') {
+                    success = await deleteUser(id);
+                } else if (tipo === 'barbeiro') {
+                    success = await deleteBarbeiro(id);
+                }
+                
+                if (success) {
+                    alert('Usuário excluído com sucesso!');
+                    await loadManagementLists();
+                } else {
+                    alert('Erro ao excluir usuário.');
+                }
+            }
+        });
+    });
+}
