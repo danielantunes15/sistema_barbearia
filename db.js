@@ -1,93 +1,135 @@
-// Inicializar "banco de dados" se não existir
-if (!localStorage.getItem('users')) {
-    const initialUsers = [
-        {
-            id: 'user_1',
-            nome: 'João Silva',
-            dataNascimento: '1990-05-15',
-            cpf: '12345678901',
-            email: 'joao@example.com',
-            password: '123456',
-            pontos: 8,
-            dataCadastro: '2023-01-15',
-            historico: [
-                { data: '15/01/2023', hora: '10:30', tipo: 'corte', barbeiro: 'Carlos' },
-                { data: '01/02/2023', hora: '14:00', tipo: 'corte', barbeiro: 'Carlos' },
-                { data: '20/02/2023', hora: '11:15', tipo: 'corte', barbeiro: 'Carlos' },
-                { data: '10/03/2023', hora: '16:30', tipo: 'corte', barbeiro: 'Carlos' },
-                { data: '28/03/2023', hora: '09:45', tipo: 'corte', barbeiro: 'Carlos' },
-                { data: '15/04/2023', hora: '13:20', tipo: 'corte', barbeiro: 'Carlos' },
-                { data: '30/04/2023', hora: '15:10', tipo: 'corte', barbeiro: 'Carlos' },
-                { data: '18/05/2023', hora: '10:00', tipo: 'corte', barbeiro: 'Carlos' }
-            ]
-        },
-        {
-            id: 'user_2',
-            nome: 'Maria Santos',
-            dataNascimento: '1985-08-22',
-            cpf: '98765432100',
-            email: 'maria@example.com',
-            password: '123456',
-            pontos: 6,
-            dataCadastro: '2023-02-10',
-            historico: [
-                { data: '10/02/2023', hora: '11:00', tipo: 'corte', barbeiro: 'Carlos' },
-                { data: '25/02/2023', hora: '14:30', tipo: 'corte', barbeiro: 'Carlos' },
-                { data: '12/03/2023', hora: '10:15', tipo: 'corte', barbeiro: 'Carlos' },
-                { data: '28/03/2023', hora: '16:45', tipo: 'corte', barbeiro: 'Carlos' },
-                { data: '15/04/2023', hora: '13:00', tipo: 'corte', barbeiro: 'Carlos' },
-                { data: '30/04/2023', hora: '15:30', tipo: 'corte', barbeiro: 'Carlos' }
-            ]
-        }
-    ];
+/* danielantunes15/sistema_barbearia/sistema_barbearia-197d2932e7e3d39489bf9472ce2a71471b9e3a99/db.js */
+
+// Funções auxiliares para o banco de dados Supabase
+
+/**
+ * Busca um usuário pelo ID.
+ */
+async function getUserById(id) {
+    const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', id)
+        .single();
     
-    localStorage.setItem('users', JSON.stringify(initialUsers));
-    console.log('Dados iniciais criados com sucesso!');
+    // PGRST116: "single" não encontrou resultados (não é um erro real)
+    if (error && error.code !== 'PGRST116') {
+        console.error('Erro ao buscar usuário por ID:', error);
+    }
+    return data;
 }
 
-// Inicializar barbeiros
-if (!localStorage.getItem('barbeiros')) {
-    const initialBarbeiros = [
-        {
-            id: 'barbeiro_1',
-            nome: 'Carlos Silva',
-            email: 'carlos@barbearia.com',
-            password: '123456',
-            dataCadastro: '2023-01-01'
-        },
-        {
-            id: 'barbeiro_2',
-            nome: 'Ricardo Santos',
-            email: 'ricardo@barbearia.com',
-            password: '123456',
-            dataCadastro: '2023-01-01'
-        }
-    ];
+/**
+ * Busca um usuário pelo CPF e SENHA HASHED.
+ */
+async function getUserByCpfAndPassword(cpf, hashedPassword) {
+    const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('cpf', cpf)
+        .eq('password', hashedPassword) // Compara com o hash
+        .single();
     
-    localStorage.setItem('barbeiros', JSON.stringify(initialBarbeiros));
-    console.log('Barbeiros iniciais criados com sucesso!');
+    if (error && error.code !== 'PGRST116') {
+        console.error('Erro ao buscar usuário por CPF/Senha:', error);
+    }
+    return data;
 }
 
-// Funções auxiliares para o "banco de dados"
-function getUserById(id) {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    return users.find(u => u.id === id);
+/**
+ * Busca um barbeiro pelo Email e SENHA HASHED.
+ */
+async function getBarbeiroByEmailAndPassword(email, hashedPassword) {
+    const { data, error } = await supabase
+        .from('barbeiros')
+        .select('*')
+        .eq('email', email)
+        .eq('password', hashedPassword) // Compara com o hash
+        .single();
+    
+    if (error && error.code !== 'PGRST116') {
+        console.error('Erro ao buscar barbeiro por Email/Senha:', error);
+    }
+    return data;
 }
 
-function updateUser(user) {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const index = users.findIndex(u => u.id === user.id);
+/**
+ * Verifica se um email ou CPF já existe na tabela de usuários.
+ */
+async function emailOrCpfExists(email, cpf) {
+    const { data, error } = await supabase
+        .from('users')
+        .select('id, email, cpf')
+        .or(`email.eq.${email},cpf.eq.${cpf}`);
     
-    if (index !== -1) {
-        users[index] = user;
-        localStorage.setItem('users', JSON.stringify(users));
-        return true;
+    if (error) {
+        console.error('Erro ao verificar email/cpf:', error);
+        return true; // Assume que existe para evitar falha no cadastro
     }
     
-    return false;
+    return data.length > 0;
 }
 
-function getBarbeiroById(id) {
-    const barbeiros = JSON.parse(localStorage.getItem('barbeiros') || '[]');
-    return barbeiros.find(b => b.id === id);
+/**
+ * Cria um novo usuário no banco de dados.
+ */
+async function createNewUser(newUser) {
+    const { data, error } = await supabase
+        .from('users')
+        .insert([newUser])
+        .select()
+        .single();
+        
+    if (error) {
+        console.error('Erro ao criar novo usuário:', error);
+        return null;
+    }
+    return data;
+}
+
+/**
+ * Atualiza um usuário existente (baseado no ID).
+ */
+async function updateUser(user) {
+    const { error } = await supabase
+        .from('users')
+        .update(user)
+        .eq('id', user.id);
+    
+    if (error) {
+        console.error('Erro ao atualizar usuário:', error);
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Busca todos os usuários.
+ */
+async function getAllUsers() {
+    const { data, error } = await supabase
+        .from('users')
+        .select('*');
+    
+    if (error) {
+        console.error('Erro ao buscar todos os usuários:', error);
+        return [];
+    }
+    return data || [];
+}
+
+/**
+ * Busca um barbeiro pelo ID.
+ */
+async function getBarbeiroById(id) {
+    const { data, error } = await supabase
+        .from('barbeiros')
+        .select('*')
+        .eq('id', id)
+        .single();
+    
+    if (error && error.code !== 'PGRST116') {
+        console.error('Erro ao buscar barbeiro por ID:', error);
+    }
+    return data;
 }

@@ -10,19 +10,17 @@
     <div class="container">
         <div class="header">
             <h1>Scanner</h1>
-            <a href="index.html" class="btn-secondary">Sair</a>
+            <a href="dashboard-barbeiro.html" class="btn-secondary">Voltar</a>
         </div>
         
         <div class="card">
             <p>Posicione o QR Code do cliente dentro da área de leitura</p>
             
             <div id="reader" class="scanner-container">
-                <!-- O scanner será inicializado via JavaScript -->
-            </div>
+                </div>
             
-            <div id="result" class="result-container">
-                <!-- Resultado da leitura será exibido aqui -->
-            </div>
+            <div id="result" class="result-container" style="display: none;">
+                </div>
         </div>
         
         <div class="actions">
@@ -32,6 +30,10 @@
     </div>
     
     <script src="https://unpkg.com/html5-qrcode"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+    <script src="supabase_config.js"></script>
     <script src="db.js"></script>
     <script src="script.js"></script>
 </body>

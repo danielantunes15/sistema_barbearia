@@ -13,8 +13,7 @@
             <a href="dashboard-barbeiro.html" class="btn-secondary">Voltar</a>
         </div>
         
-        <div class="card">
-            <h3>Filtros</h3>
+        <div class="card" style="display: none;"> <h3>Filtros</h3>
             <div class="filters">
                 <select id="periodo">
                     <option value="hoje">Hoje</option>
@@ -31,29 +30,26 @@
         
         <div class="stats-grid">
             <div class="stat-card large">
-                <h4>Clientes Mais Frequentes</h4>
+                <h4>Clientes Mais Frequentes (Top 5)</h4>
                 <div id="clientesFrequentes" class="ranking-list">
-                    <!-- Ranking de clientes frequentes -->
-                </div>
+                    </div>
             </div>
             
             <div class="stat-card large">
-                <h4>Horários Mais Movimentados</h4>
+                <h4>Horários Mais Movimentados (Top 5)</h4>
                 <div id="horariosMovimento" class="horarios-list">
-                    <!-- Horários de pico -->
-                </div>
+                    </div>
             </div>
         </div>
         
         <div class="card">
-            <h3>Relatório de Cortes</h3>
+            <h3>Relatório de Clientes (Todos)</h3>
             <div id="relatorioCortes" class="relatorio-container">
-                <!-- Relatório detalhado -->
-            </div>
+                </div>
         </div>
         
         <div class="card">
-            <h3>Exportar Dados</h3>
+            <h3>Exportar Dados (CSV)</h3>
             <div class="actions">
                 <button id="exportClientes" class="btn">Exportar Lista de Clientes</button>
                 <button id="exportCortes" class="btn btn-secondary">Exportar Histórico de Cortes</button>
@@ -61,6 +57,9 @@
         </div>
     </div>
     
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+    <script src="supabase_config.js"></script>
     <script src="db.js"></script>
     <script src="script.js"></script>
 </body>

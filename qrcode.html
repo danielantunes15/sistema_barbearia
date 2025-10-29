@@ -10,20 +10,19 @@
     <div class="container">
         <div class="header">
             <h1>Meu QR Code</h1>
-            <a href="dashboard.html" class="btn-secondary">Voltar</a>
+            <a href="dashboard-cliente.html" class="btn-secondary">Voltar</a>
         </div>
         
         <div class="card">
             <p>Apresente este QR Code ao barbeiro para validar seu corte</p>
             
             <div id="qrcode" class="qrcode-container">
-                <!-- QR Code será gerado via JavaScript -->
-            </div>
+                </div>
             
-            <p class="user-id">ID do usuário: <span id="userId"></span></p>
+            <p class="user-id">ID do usuário: <span id="userId">Carregando...</span></p>
         </div>
         
-        <div class="instructions">
+        <div class="instructions" style="color: var(--text-secondary); padding: 15px;">
             <h3>Como funciona:</h3>
             <ol>
                 <li>Apresente este QR Code ao barbeiro</li>
@@ -35,6 +34,10 @@
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+    <script src="supabase_config.js"></script>
     <script src="db.js"></script>
     <script src="script.js"></script>
 </body>

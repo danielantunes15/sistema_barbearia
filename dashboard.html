@@ -14,7 +14,7 @@
         </div>
         
         <div class="user-info">
-            <h2 id="userName"></h2>
+            <h2 id="userName">Carregando...</h2>
             <p id="userEmail"></p>
         </div>
         
@@ -28,7 +28,7 @@
                 <div class="progress-bar">
                     <div id="progressFill" class="progress-fill"></div>
                 </div>
-                <p class="points-info">A cada 10 cortes, você ganha 1 corte grátis!</p>
+                <p class="points-info" id="pointsInfo">A cada 10 cortes, você ganha 1 corte grátis!</p>
             </div>
         </div>
         
@@ -39,11 +39,13 @@
         <div class="card">
             <h3>Histórico de Cortes</h3>
             <ul id="historyList" class="history-list">
-                <!-- Histórico será preenchido via JavaScript -->
-            </ul>
+                </ul>
         </div>
     </div>
     
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+    <script src="supabase_config.js"></script>
     <script src="db.js"></script>
     <script src="script.js"></script>
 </body>

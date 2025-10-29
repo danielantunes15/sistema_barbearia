@@ -1,3 +1,5 @@
+/* danielantunes15/sistema_barbearia/sistema_barbearia-197d2932e7e3d39489bf9472ce2a71471b9e3a99/script.js */
+
 // Função para formatar CPF
 function formatarCPF(campo) {
     let cpf = campo.value.replace(/\D/g, '');
@@ -6,7 +8,6 @@ function formatarCPF(campo) {
         cpf = cpf.substring(0, 11);
     }
     
-    // Formata o CPF
     if (cpf.length <= 11) {
         cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
         cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
@@ -16,40 +17,59 @@ function formatarCPF(campo) {
     campo.value = cpf;
 }
 
-// Função para validar CPF (versão simplificada para teste)
+// Função para validar CPF (simplificada)
 function validarCPF(cpf) {
     cpf = cpf.replace(/\D/g, '');
-    
     if (cpf.length !== 11) return false;
-    
-    // Verifica CPFs conhecidos como inválidos
     const cpfsInvalidos = [
-        '00000000000', '11111111111', '22222222222',
-        '33333333333', '44444444444', '55555555555',
-        '66666666666', '77777777777', '88888888888', '99999999999'
+        '00000000000', '11111111111', '22222222222', '33333333333', 
+        '44444444444', '55555555555', '66666666666', '77777777777', 
+        '88888888888', '99999999999'
     ];
-    
     if (cpfsInvalidos.includes(cpf)) return false;
-    
-    return true; // Para testes, aceita qualquer CPF com 11 dígitos
+    return true; 
 }
 
-// Verifica se o usuário está logado
-function checkAuth() {
-    const currentUser = localStorage.getItem('currentUser');
-    const currentBarbeiro = localStorage.getItem('currentBarbeiro');
+// Verifica se o usuário está logado (agora assíncrono)
+async function checkAuth() {
+    const currentUserJSON = localStorage.getItem('currentUser');
+    const currentBarbeiroJSON = localStorage.getItem('currentBarbeiro');
     
-    if (!currentUser && !currentBarbeiro && 
-        !window.location.href.includes('index.html') && 
-        !window.location.href.includes('cadastro.html') && 
-        !window.location.href.includes('scanner.html')) {
+    const isProtectedPage = !window.location.href.includes('index.html') && 
+                            !window.location.href.includes('cadastro.html');
+
+    if (!currentUserJSON && !currentBarbeiroJSON && isProtectedPage) {
         window.location.href = 'index.html';
+        return null;
     }
     
-    if (currentUser) return { tipo: 'cliente', data: JSON.parse(currentUser) };
-    if (currentBarbeiro) return { tipo: 'barbeiro', data: JSON.parse(currentBarbeiro) };
+    try {
+        if (currentUserJSON) {
+            const userData = JSON.parse(currentUserJSON);
+            const user = await getUserById(userData.id); // Busca dados frescos
+            if (user) {
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                return { tipo: 'cliente', data: user };
+            }
+        }
+        
+        if (currentBarbeiroJSON) {
+            const barbeiroData = JSON.parse(currentBarbeiroJSON);
+            const barbeiro = await getBarbeiroById(barbeiroData.id); // Busca dados frescos
+            if (barbeiro) {
+                localStorage.setItem('currentBarbeiro', JSON.stringify(barbeiro));
+                return { tipo: 'barbeiro', data: barbeiro };
+            }
+        }
+    } catch (e) {
+        console.error("Erro na verificação de autenticação:", e);
+        localStorage.clear();
+        if (isProtectedPage) window.location.href = 'index.html';
+    }
+    
     return null;
 }
+
 
 // Tabs no login
 function showTab(tab) {
@@ -61,25 +81,25 @@ function showTab(tab) {
     document.getElementById(tab === 'cliente' ? 'loginClienteForm' : 'loginBarbeiroForm').classList.add('active');
 }
 
-// Login Cliente com CPF
+// Login Cliente com CPF (Async + Hash)
 if (document.getElementById('loginClienteForm')) {
-    document.getElementById('loginClienteForm').addEventListener('submit', function(e) {
+    document.getElementById('loginClienteForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const cpf = document.getElementById('cpfCliente').value.replace(/\D/g, '');
         const password = document.getElementById('passwordCliente').value;
         
-        console.log('Tentando login com CPF:', cpf, 'Senha:', password);
+        console.log('Tentando login com CPF:', cpf);
         
         if (cpf.length !== 11) {
             alert('CPF deve ter 11 dígitos!');
             return;
         }
-        
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        console.log('Usuários no sistema:', users);
-        
-        const user = users.find(u => u.cpf === cpf && u.password === password);
+
+        const hashedPassword = hashPassword(password);
+        if (!hashedPassword) return;
+
+        const user = await getUserByCpfAndPassword(cpf, hashedPassword);
         
         if (user) {
             console.log('Usuário encontrado:', user);
@@ -92,9 +112,9 @@ if (document.getElementById('loginClienteForm')) {
     });
 }
 
-// Login Barbeiro
+// Login Barbeiro (Async + Hash)
 if (document.getElementById('loginBarbeiroForm')) {
-    document.getElementById('loginBarbeiroForm').addEventListener('submit', function(e) {
+    document.getElementById('loginBarbeiroForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const email = document.getElementById('emailBarbeiro').value;
@@ -102,10 +122,10 @@ if (document.getElementById('loginBarbeiroForm')) {
         
         console.log('Tentando login barbeiro:', email);
         
-        const barbeiros = JSON.parse(localStorage.getItem('barbeiros') || '[]');
-        console.log('Barbeiros no sistema:', barbeiros);
-        
-        const barbeiro = barbeiros.find(b => b.email === email && b.password === password);
+        const hashedPassword = hashPassword(password);
+        if (!hashedPassword) return;
+
+        const barbeiro = await getBarbeiroByEmailAndPassword(email, hashedPassword);
         
         if (barbeiro) {
             console.log('Barbeiro encontrado:', barbeiro);
@@ -118,9 +138,9 @@ if (document.getElementById('loginBarbeiroForm')) {
     });
 }
 
-// Cadastro Cliente com CPF e Data Nascimento
+// Cadastro Cliente (Async + Hash)
 if (document.getElementById('cadastroForm')) {
-    document.getElementById('cadastroForm').addEventListener('submit', function(e) {
+    document.getElementById('cadastroForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const nome = document.getElementById('nome').value;
@@ -131,13 +151,11 @@ if (document.getElementById('cadastroForm')) {
         
         console.log('Tentando cadastro:', { nome, cpf, email });
         
-        // Validar CPF
-        if (cpf.length !== 11) {
-            alert('CPF deve ter 11 dígitos!');
+        if (cpf.length !== 11 || !validarCPF(cpf)) {
+            alert('CPF inválido!');
             return;
         }
         
-        // Validar data de nascimento
         if (!dataNascimento) {
             alert('Data de nascimento é obrigatória!');
             return;
@@ -145,19 +163,31 @@ if (document.getElementById('cadastroForm')) {
         
         const nascimento = new Date(dataNascimento);
         const hoje = new Date();
-        const idade = hoje.getFullYear() - nascimento.getFullYear();
+        let idade = hoje.getFullYear() - nascimento.getFullYear();
+        const mes = hoje.getMonth() - nascimento.getMonth();
+        if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
+            idade--;
+        }
         
         if (idade < 16) {
             alert('É necessário ter pelo menos 16 anos para se cadastrar.');
             return;
         }
         
-        // Validar senha
         if (password.length < 6) {
             alert('A senha deve ter pelo menos 6 caracteres.');
             return;
         }
+
+        // Verificar se o CPF ou e-mail já existe
+        if (await emailOrCpfExists(email, cpf)) {
+            alert('Este CPF ou e-mail já está cadastrado!');
+            return;
+        }
         
+        const hashedPassword = hashPassword(password);
+        if (!hashedPassword) return;
+
         const userId = 'user_' + Date.now();
         
         const newUser = {
@@ -166,165 +196,178 @@ if (document.getElementById('cadastroForm')) {
             dataNascimento: dataNascimento,
             cpf: cpf,
             email: email,
-            password: password,
+            password: hashedPassword, // Salva o hash
             pontos: 0,
             historico: [],
             dataCadastro: new Date().toISOString()
         };
         
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const createdUser = await createNewUser(newUser);
         
-        // Verificar se o CPF já existe
-        if (users.find(u => u.cpf === cpf)) {
-            alert('Este CPF já está cadastrado!');
-            return;
+        if (createdUser) {
+            console.log('Usuário cadastrado com sucesso:', createdUser);
+            localStorage.setItem('currentUser', JSON.stringify(createdUser));
+            window.location.href = 'dashboard-cliente.html';
+        } else {
+            alert('Ocorreu um erro no cadastro. Tente novamente.');
         }
-        
-        // Verificar se o e-mail já existe
-        if (users.find(u => u.email === email)) {
-            alert('Este e-mail já está cadastrado!');
-            return;
-        }
-        
-        users.push(newUser);
-        localStorage.setItem('users', JSON.stringify(users));
-        
-        console.log('Usuário cadastrado com sucesso:', newUser);
-        console.log('Total de usuários agora:', users.length);
-        
-        localStorage.setItem('currentUser', JSON.stringify(newUser));
-        window.location.href = 'dashboard-cliente.html';
     });
 }
 
-// Dashboard Cliente (Atualizado para mostrar CPF)
+// Dashboard Cliente (Async IIFE)
 if (document.getElementById('userName')) {
-    const auth = checkAuth();
-    
-    if (auth && auth.tipo === 'cliente') {
-        const user = auth.data;
+    (async () => {
+        const auth = await checkAuth();
         
-        console.log('Carregando dashboard do cliente:', user);
-        
-        document.getElementById('userName').textContent = user.nome;
-        document.getElementById('userEmail').textContent = user.email;
-        
-        // Formatar e mostrar CPF
-        const cpfFormatado = user.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-        document.getElementById('userTelefone').textContent = `CPF: ${cpfFormatado}`;
-        
-        // Calcular e mostrar idade se tiver data de nascimento
-        if (user.dataNascimento) {
-            const nascimento = new Date(user.dataNascimento);
-            const hoje = new Date();
-            let idade = hoje.getFullYear() - nascimento.getFullYear();
-            const mes = hoje.getMonth() - nascimento.getMonth();
-            if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
-                idade--;
+        if (auth && auth.tipo === 'cliente') {
+            const user = auth.data;
+            
+            console.log('Carregando dashboard do cliente:', user);
+            
+            document.getElementById('userName').textContent = user.nome;
+            document.getElementById('userEmail').textContent = user.email;
+            
+            const cpfFormatado = user.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+            let userInfoExtra = `CPF: ${cpfFormatado}`;
+            
+            if (user.dataNascimento) {
+                const nascimento = new Date(user.dataNascimento);
+                const hoje = new Date();
+                let idade = hoje.getFullYear() - nascimento.getFullYear();
+                const mes = hoje.getMonth() - nascimento.getMonth();
+                if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
+                    idade--;
+                }
+                userInfoExtra += ` | Idade: ${idade} anos`;
             }
-            document.getElementById('userTelefone').textContent += ` | Idade: ${idade} anos`;
-        }
-        
-        document.getElementById('currentPoints').textContent = user.pontos;
-        
-        // Calcular estatísticas
-        const totalCortes = user.historico ? user.historico.length : 0;
-        const cortesGratis = Math.floor(user.pontos / 10);
-        const frequencia = calcularFrequencia(user.historico);
-        
-        document.getElementById('totalCortes').textContent = totalCortes;
-        document.getElementById('cortesGratis').textContent = cortesGratis;
-        document.getElementById('frequencia').textContent = frequencia;
-        
-        // Atualizar barra de progresso
-        const progressFill = document.getElementById('progressFill');
-        const progressPercentage = (user.pontos / 10) * 100;
-        progressFill.style.width = `${progressPercentage}%`;
-        
-        // Mensagem motivacional
-        const pontosInfo = document.getElementById('pointsInfo');
-        if (user.pontos >= 10) {
-            pontosInfo.innerHTML = '🎉 Parabéns! Você tem direito a um corte grátis!';
-            pontosInfo.style.color = '#27ae60';
-            pontosInfo.style.fontWeight = 'bold';
-        } else if (user.pontos >= 8) {
-            pontosInfo.innerHTML = '💪 Quase lá! Faltam apenas ' + (10 - user.pontos) + ' cortes para ganhar um grátis!';
-        } else if (user.pontos >= 5) {
-            pontosInfo.innerHTML = '👍 Continue assim! Já tem ' + user.pontos + ' de 10 cortes!';
-        }
-        
-        // Preencher histórico
-        const historyList = document.getElementById('historyList');
-        historyList.innerHTML = '';
-        
-        if (user.historico && user.historico.length > 0) {
-            user.historico.slice(0, 10).forEach(corte => {
+            // Verifica se o elemento userTelefone existe (presente em dashboard-cliente.html)
+            if (document.getElementById('userTelefone')) {
+                document.getElementById('userTelefone').textContent = userInfoExtra;
+            }
+            
+            document.getElementById('currentPoints').textContent = user.pontos;
+            
+            const totalCortes = user.historico ? user.historico.length : 0;
+            const cortesGratis = Math.floor(user.pontos / 10);
+            
+            // Verifica se os elementos de estatísticas existem
+            if (document.getElementById('totalCortes')) {
+                document.getElementById('totalCortes').textContent = totalCortes;
+                document.getElementById('cortesGratis').textContent = cortesGratis;
+                document.getElementById('frequencia').textContent = calcularFrequencia(user.historico);
+            }
+
+            const progressFill = document.getElementById('progressFill');
+            const progressPercentage = (user.pontos / 10) * 100;
+            progressFill.style.width = `${progressPercentage}%`;
+            
+            const pontosInfo = document.getElementById('pointsInfo');
+            if (pontosInfo) {
+                if (user.pontos >= 10) {
+                    pontosInfo.innerHTML = '🎉 Parabéns! Você tem direito a um corte grátis!';
+                    pontosInfo.style.color = '#27ae60';
+                    pontosInfo.style.fontWeight = 'bold';
+                } else if (user.pontos >= 8) {
+                    pontosInfo.innerHTML = '💪 Quase lá! Faltam apenas ' + (10 - user.pontos) + ' cortes para ganhar um grátis!';
+                } else if (user.pontos >= 5) {
+                    pontosInfo.innerHTML = '👍 Continue assim! Já tem ' + user.pontos + ' de 10 cortes!';
+                }
+            }
+            
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '';
+            
+            if (user.historico && user.historico.length > 0) {
+                // Mostra os 10 mais recentes
+                user.historico.slice(0, 10).forEach(corte => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <span>${corte.data} (${corte.hora || ''})</span>
+                        <span>Corte com ${corte.barbeiro || 'N/A'}</span>
+                    `;
+                    historyList.appendChild(li);
+                });
+            } else {
                 const li = document.createElement('li');
-                li.innerHTML = `
-                    <span>${corte.data}</span>
-                    <span>Corte registrado</span>
-                `;
+                li.textContent = 'Nenhum corte registrado ainda';
                 historyList.appendChild(li);
+            }
+            
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('currentBarbeiro');
+                window.location.href = 'index.html';
             });
+        } else if (auth && auth.tipo === 'barbeiro') {
+             console.log('Barbeiro acessou página de cliente, redirecionando...');
+             window.location.href = 'dashboard-barbeiro.html';
         } else {
-            const li = document.createElement('li');
-            li.textContent = 'Nenhum corte registrado ainda';
-            historyList.appendChild(li);
+            console.log('Usuário não autenticado, redirecionando...');
+            window.location.href = 'index.html';
         }
-        
-        // Logout
-        document.getElementById('logoutBtn').addEventListener('click', function() {
-            localStorage.removeItem('currentUser');
-            window.location.href = 'index.html';
-        });
-    } else {
-        console.log('Usuário não autenticado, redirecionando...');
-        window.location.href = 'index.html';
-    }
+    })();
 }
 
-// Dashboard Barbeiro (Atualizado para mostrar CPF dos clientes)
+// Dashboard Barbeiro (Async IIFE)
 if (document.getElementById('barbeiroNome')) {
-    const auth = checkAuth();
-    
-    if (auth && auth.tipo === 'barbeiro') {
-        const barbeiro = auth.data;
-        document.getElementById('barbeiroNome').textContent = barbeiro.nome;
+    (async () => {
+        const auth = await checkAuth();
         
-        carregarDashboardBarbeiro();
-        
-        // Logout
-        document.getElementById('logoutBtn').addEventListener('click', function() {
-            localStorage.removeItem('currentBarbeiro');
+        if (auth && auth.tipo === 'barbeiro') {
+            const barbeiro = auth.data;
+            document.getElementById('barbeiroNome').textContent = barbeiro.nome;
+            
+            await carregarDashboardBarbeiro();
+            
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('currentBarbeiro');
+                window.location.href = 'index.html';
+            });
+        } else if (auth && auth.tipo === 'cliente') {
+             console.log('Cliente acessou página de barbeiro, redirecionando...');
+             window.location.href = 'dashboard-cliente.html';
+        } else {
+            console.log('Barbeiro não autenticado, redirecionando...');
             window.location.href = 'index.html';
-        });
-    } else {
-        console.log('Barbeiro não autenticado, redirecionando...');
-        window.location.href = 'index.html';
-    }
+        }
+    })();
 }
 
-function carregarDashboardBarbeiro() {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
+async function carregarDashboardBarbeiro() {
+    const users = await getAllUsers();
     const hoje = new Date().toLocaleDateString('pt-BR');
     
     console.log('Carregando dashboard barbeiro. Total de clientes:', users.length);
     
-    // Estatísticas gerais
     document.getElementById('totalClientes').textContent = users.length;
-    document.getElementById('cortesHoje').textContent = users.reduce((total, user) => 
-        total + (user.historico ? user.historico.filter(h => h.data === hoje).length : 0), 0
-    );
-    document.getElementById('cortesMes').textContent = users.reduce((total, user) => 
-        total + (user.historico ? user.historico.filter(h => {
-            const dataCorte = new Date(h.data.split('/').reverse().join('-'));
-            const hoje = new Date();
-            return dataCorte.getMonth() === hoje.getMonth() && dataCorte.getFullYear() === hoje.getFullYear();
-        }).length : 0), 0
-    );
+    
+    let cortesHoje = 0;
+    let cortesMes = 0;
+    const mesAtual = new Date().getMonth();
+    const anoAtual = new Date().getFullYear();
+
+    users.forEach(user => {
+        if (user.historico) {
+            user.historico.forEach(h => {
+                if (h.data === hoje) {
+                    cortesHoje++;
+                }
+                
+                try {
+                    const dataCorte = new Date(h.data.split('/').reverse().join('-'));
+                    if (dataCorte.getMonth() === mesAtual && dataCorte.getFullYear() === anoAtual) {
+                        cortesMes++;
+                    }
+                } catch(e) {}
+            });
+        }
+    });
+
+    document.getElementById('cortesHoje').textContent = cortesHoje;
+    document.getElementById('cortesMes').textContent = cortesMes;
     document.getElementById('totalFidelidades').textContent = users.filter(u => u.pontos >= 10).length;
     
-    // Clientes próximos da fidelidade (8+ pontos)
     const clientesProximos = users.filter(u => u.pontos >= 8 && u.pontos < 10)
         .sort((a, b) => b.pontos - a.pontos);
     
@@ -352,7 +395,6 @@ function carregarDashboardBarbeiro() {
         containerProximos.innerHTML = '<p style="text-align: center; color: #b3b3b3;">Nenhum cliente próximo da fidelidade</p>';
     }
     
-    // Todos os clientes
     const containerTodos = document.getElementById('todosClientes');
     containerTodos.innerHTML = '';
     
@@ -362,13 +404,15 @@ function carregarDashboardBarbeiro() {
         else if (cliente.pontos >= 5) badgeClass = 'medio';
         
         const cpfFormatado = cliente.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+        const dataCadastroFormatada = cliente.dataCadastro ? new Date(cliente.dataCadastro).toLocaleDateString('pt-BR') : 'N/A';
+
         const div = document.createElement('div');
         div.className = 'cliente-item';
         div.innerHTML = `
             <div class="cliente-info">
                 <h4>${cliente.nome}</h4>
                 <p>${cpfFormatado} • ${cliente.email}</p>
-                <p style="font-size: 0.8rem;">Cadastro: ${new Date(cliente.dataCadastro).toLocaleDateString('pt-BR')}</p>
+                <p style="font-size: 0.8rem;">Cadastro: ${dataCadastroFormatada}</p>
             </div>
             <div class="cliente-stats">
                 <span class="pontos-badge ${badgeClass}">${cliente.pontos} pontos</span>
@@ -378,7 +422,6 @@ function carregarDashboardBarbeiro() {
         containerTodos.appendChild(div);
     });
     
-    // Busca de clientes
     if (document.getElementById('searchClient')) {
         document.getElementById('searchClient').addEventListener('input', function(e) {
             const termo = e.target.value.toLowerCase();
@@ -391,7 +434,6 @@ function carregarDashboardBarbeiro() {
         });
     }
     
-    // Estatísticas de frequência
     carregarEstatisticasFrequencia(users);
 }
 
@@ -399,14 +441,15 @@ function carregarEstatisticasFrequencia(users) {
     const container = document.getElementById('estatisticasFrequencia');
     if (!container) return;
     
-    // Clientes mais frequentes (últimos 30 dias)
     const trintaDiasAtras = new Date();
     trintaDiasAtras.setDate(trintaDiasAtras.getDate() - 30);
     
     const clientesFrequentes = users.map(user => {
         const cortesRecentes = user.historico ? user.historico.filter(h => {
-            const dataCorte = new Date(h.data.split('/').reverse().join('-'));
-            return dataCorte >= trintaDiasAtras;
+            try {
+                const dataCorte = new Date(h.data.split('/').reverse().join('-'));
+                return dataCorte >= trintaDiasAtras;
+            } catch(e) { return false; }
         }).length : 0;
         
         return { ...user, cortesRecentes };
@@ -419,7 +462,7 @@ function carregarEstatisticasFrequencia(users) {
     if (clientesFrequentes.length > 0) {
         clientesFrequentes.forEach((cliente, index) => {
             html += `
-                <div class="ranking-item">
+                <div class="ranking-item" style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #444;">
                     <span>${index + 1}. ${cliente.nome}</span>
                     <span>${cliente.cortesRecentes} cortes</span>
                 </div>
@@ -435,72 +478,70 @@ function carregarEstatisticasFrequencia(users) {
 function calcularFrequencia(historico) {
     if (!historico || historico.length < 2) return '-';
     
-    const datas = historico.map(h => new Date(h.data.split('/').reverse().join('-')))
-        .sort((a, b) => a - b);
-    
-    const diferencas = [];
-    for (let i = 1; i < datas.length; i++) {
-        const diff = (datas[i] - datas[i-1]) / (1000 * 60 * 60 * 24); // diferença em dias
-        diferencas.push(diff);
+    try {
+        const datas = historico.map(h => new Date(h.data.split('/').reverse().join('-')))
+            .sort((a, b) => a - b);
+        
+        const diferencas = [];
+        for (let i = 1; i < datas.length; i++) {
+            const diff = (datas[i] - datas[i-1]) / (1000 * 60 * 60 * 24); 
+            diferencas.push(diff);
+        }
+        
+        const mediaDias = diferencas.reduce((a, b) => a + b, 0) / diferencas.length;
+        
+        if (mediaDias <= 15) return 'Alta';
+        if (mediaDias <= 30) return 'Média';
+        return 'Baixa';
+    } catch(e) {
+        return '-';
     }
-    
-    const mediaDias = diferencas.reduce((a, b) => a + b, 0) / diferencas.length;
-    
-    if (mediaDias <= 15) return 'Alta';
-    if (mediaDias <= 30) return 'Média';
-    return 'Baixa';
 }
 
-// QR Code
+// QR Code (Async IIFE)
 if (document.getElementById('qrcode')) {
-    const auth = checkAuth();
-    
-    if (auth && auth.tipo === 'cliente') {
-        const user = auth.data;
-        document.getElementById('userId').textContent = user.id;
+    (async () => {
+        const auth = await checkAuth();
         
-        const qrcodeContainer = document.getElementById('qrcode');
-        
-        try {
-            QRCode.toCanvas(qrcodeContainer, user.id, {
-                width: 200,
-                margin: 2,
-                color: {
-                    dark: '#000000',
-                    light: '#FFFFFF'
-                }
-            }, function(error) {
-                if (error) {
-                    console.error(error);
-                    showFallbackQRCode(user.id, qrcodeContainer);
-                }
-            });
-        } catch (error) {
-            console.error('Erro ao gerar QR Code:', error);
-            showFallbackQRCode(user.id, qrcodeContainer);
+        if (auth && auth.tipo === 'cliente') {
+            const user = auth.data;
+            document.getElementById('userId').textContent = user.id;
+            
+            const qrcodeContainer = document.getElementById('qrcode');
+            
+            try {
+                QRCode.toCanvas(qrcodeContainer, user.id, {
+                    width: 200,
+                    margin: 2,
+                    color: { dark: '#000000', light: '#FFFFFF' }
+                }, function(error) {
+                    if (error) {
+                        console.error(error);
+                        showFallbackQRCode(user.id, qrcodeContainer);
+                    }
+                });
+            } catch (error) {
+                console.error('Erro ao gerar QR Code:', error);
+                showFallbackQRCode(user.id, qrcodeContainer);
+            }
+        } else {
+            window.location.href = 'index.html';
         }
-    } else {
-        window.location.href = 'index.html';
-    }
+    })();
 }
 
 function showFallbackQRCode(userId, container) {
     container.innerHTML = `
         <div style="text-align: center; padding: 20px;">
-            <div style="background: white; padding: 20px; border-radius: 10px; border: 2px solid #444; display: inline-block;">
-                <h3 style="color: #333; margin-bottom: 15px;">ID do Usuário</h3>
-                <div style="font-size: 18px; font-weight: bold; background: #f8f9fa; padding: 15px; border-radius: 5px; letter-spacing: 2px;">
-                    ${userId}
-                </div>
-            </div>
-            <p style="color: #b3b3b3; margin-top: 15px;">
-                Mostre este código ao barbeiro caso o QR Code não funcione
-            </p>
+            <p>Falha ao carregar QR Code.</p>
+            <p>Mostre este ID ao barbeiro:</p>
+            <strong style="font-size: 1.2rem; color: var(--accent);">${userId}</strong>
         </div>
     `;
+    container.style.height = 'auto';
 }
 
-// Scanner
+// Scanner (Async onScanSuccess)
 if (document.getElementById('reader')) {
     let html5QrcodeScanner;
     
@@ -512,15 +553,14 @@ if (document.getElementById('reader')) {
         
         html5QrcodeScanner.start(
             { facingMode: "environment" },
-            {
-                fps: 10,
-                qrbox: { width: 250, height: 250 }
-            },
-            onScanSuccess,
+            { fps: 10, qrbox: { width: 250, height: 250 } },
+            onScanSuccess, // Função de sucesso (agora async)
             onScanFailure
         ).catch(err => {
             console.error(err);
             alert('Erro ao iniciar a câmera. Verifique as permissões.');
+            document.getElementById('stopScanner').style.display = 'none';
+            document.getElementById('startScanner').style.display = 'inline-block';
         });
     });
     
@@ -529,59 +569,63 @@ if (document.getElementById('reader')) {
         document.getElementById('startScanner').style.display = 'inline-block';
         
         if (html5QrcodeScanner) {
-            html5QrcodeScanner.stop().then(ignore => {
-                // Scanner parado
-            }).catch(err => {
-                console.error(err);
-            });
+            html5QrcodeScanner.stop().catch(err => console.error(err));
         }
     });
     
-    function onScanSuccess(decodedText, decodedResult) {
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        const user = users.find(u => u.id === decodedText);
-        
+    async function onScanSuccess(decodedText, decodedResult) {
+        // 1. Buscar usuário no Supabase
+        const user = await getUserById(decodedText);
         const resultContainer = document.getElementById('result');
         
         if (user) {
             const dataAtual = new Date().toLocaleDateString('pt-BR');
             const horaAtual = new Date().toLocaleTimeString('pt-BR');
             
-            user.pontos += 1;
-            if (user.pontos > 10) user.pontos = 10;
+            // 2. Preparar dados para atualização
+            // Copiamos para evitar mutação direta
+            const userToUpdate = JSON.parse(JSON.stringify(user)); 
+
+            userToUpdate.pontos = (userToUpdate.pontos || 0) + 1;
+            if (userToUpdate.pontos > 10) userToUpdate.pontos = 10;
             
-            if (!user.historico) user.historico = [];
-            user.historico.unshift({
+            if (!userToUpdate.historico) userToUpdate.historico = [];
+            
+            const barbeiroNome = JSON.parse(localStorage.getItem('currentBarbeiro') || '{}').nome || 'N/A';
+            
+            userToUpdate.historico.unshift({
                 data: dataAtual,
                 hora: horaAtual,
                 tipo: 'corte',
-                barbeiro: JSON.parse(localStorage.getItem('currentBarbeiro')).nome
+                barbeiro: barbeiroNome
             });
             
-            const userIndex = users.findIndex(u => u.id === user.id);
-            users[userIndex] = user;
-            localStorage.setItem('users', JSON.stringify(users));
+            // 3. Atualizar no Supabase
+            const success = await updateUser(userToUpdate);
             
-            resultContainer.innerHTML = `
-                <h3>✅ Corte registrado com sucesso!</h3>
-                <p><strong>Cliente:</strong> ${user.nome}</p>
-                <p><strong>CPF:</strong> ${user.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')}</p>
-                <p><strong>Pontos atuais:</strong> ${user.pontos}/10</p>
-                <p><strong>Data:</strong> ${dataAtual} ${horaAtual}</p>
-                ${user.pontos >= 10 ? '<p class="success">🎉 Parabéns! Este cliente tem direito a um corte grátis!</p>' : ''}
-            `;
-            resultContainer.className = 'result-container success';
-            
-            setTimeout(() => {
+            if (success) {
+                resultContainer.innerHTML = `
+                    <h3>✅ Corte registrado com sucesso!</h3>
+                    <p><strong>Cliente:</strong> ${user.nome}</p>
+                    <p><strong>CPF:</strong> ${user.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')}</p>
+                    <p><strong>Pontos atuais:</strong> ${userToUpdate.pontos}/10</p>
+                    <p><strong>Data:</strong> ${dataAtual} ${horaAtual}</p>
+                    ${userToUpdate.pontos >= 10 ? '<p class="success">🎉 Parabéns! Este cliente tem direito a um corte grátis!</p>' : ''}
+                `;
+                resultContainer.className = 'result-container success';
+                
+                // Parar scanner após sucesso
                 if (html5QrcodeScanner) {
-                    html5QrcodeScanner.stop().then(ignore => {
-                        document.getElementById('stopScanner').style.display = 'none';
-                        document.getElementById('startScanner').style.display = 'inline-block';
-                    }).catch(err => {
-                        console.error(err);
-                    });
+                    html5QrcodeScanner.stop().catch(err => console.error(err));
+                    document.getElementById('stopScanner').style.display = 'none';
+                    document.getElementById('startScanner').style.display = 'inline-block';
                 }
-            }, 5000);
+
+            } else {
+                resultContainer.innerHTML = '<p>❌ Erro ao salvar o corte no banco de dados!</p>';
+                resultContainer.className = 'result-container error';
+            }
+            
         } else {
             resultContainer.innerHTML = '<p>❌ QR Code inválido! Tente novamente.</p>';
             resultContainer.className = 'result-container error';
@@ -589,29 +633,30 @@ if (document.getElementById('reader')) {
     }
     
     function onScanFailure(error) {
-        // Ignorar erros de varredura
+        // Ignorar erros (QR code não encontrado, etc.)
     }
 }
 
-// Relatórios
+// Relatórios (Async)
 if (document.getElementById('aplicarFiltro')) {
-    document.getElementById('aplicarFiltro').addEventListener('click', function() {
-        carregarRelatorios();
+    document.getElementById('aplicarFiltro').addEventListener('click', async function() {
+        await carregarRelatorios();
     });
     
     // Carregar relatórios inicialmente
-    carregarRelatorios();
+    (async () => await carregarRelatorios())();
 }
 
-function carregarRelatorios() {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
+async function carregarRelatorios() {
+    const users = await getAllUsers();
     const periodo = document.getElementById('periodo').value;
     
     // Clientes mais frequentes
     const clientesFrequentes = users.map(user => ({
         ...user,
         totalCortes: user.historico ? user.historico.length : 0
-    })).sort((a, b) => b.totalCortes - a.totalCortes)
+    })).filter(u => u.totalCortes > 0)
+      .sort((a, b) => b.totalCortes - a.totalCortes)
       .slice(0, 5);
     
     const containerFrequentes = document.getElementById('clientesFrequentes');
@@ -621,17 +666,16 @@ function carregarRelatorios() {
             const div = document.createElement('div');
             div.className = 'ranking-item';
             div.innerHTML = `
-                <span>${index + 1}. ${cliente.nome}</span>
-                <span>${cliente.totalCortes} cortes</span>
+                <span style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #444;">
+                    <span>${index + 1}. ${cliente.nome}</span>
+                    <span>${cliente.totalCortes} cortes</span>
+                </span>
             `;
             containerFrequentes.appendChild(div);
         });
     }
     
-    // Horários mais movimentados
     carregarHorariosMovimento(users);
-    
-    // Relatório de cortes
     carregarRelatorioCortes(users, periodo);
 }
 
@@ -642,8 +686,10 @@ function carregarHorariosMovimento(users) {
         if (user.historico) {
             user.historico.forEach(corte => {
                 if (corte.hora) {
-                    const hora = corte.hora.split(':')[0];
-                    horarios[hora] = (horarios[hora] || 0) + 1;
+                    try {
+                        const hora = corte.hora.split(':')[0];
+                        horarios[hora] = (horarios[hora] || 0) + 1;
+                    } catch(e) {}
                 }
             });
         }
@@ -660,8 +706,10 @@ function carregarHorariosMovimento(users) {
             const div = document.createElement('div');
             div.className = 'horario-item';
             div.innerHTML = `
-                <span>${hora}h</span>
-                <span>${quantidade} cortes</span>
+                <span style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #444;">
+                    <span>${hora}h - ${parseInt(hora)+1}h</span>
+                    <span>${quantidade} cortes</span>
+                </span>
             `;
             containerHorarios.appendChild(div);
         });
@@ -672,17 +720,19 @@ function carregarRelatorioCortes(users, periodo) {
     const container = document.getElementById('relatorioCortes');
     if (!container) return;
     
+    // TODO: Implementar filtro de 'periodo' (atualmente mostra todos)
+    
     let html = `
-        <div class="relatorio-item" style="font-weight: bold; background: #3a3a3a;">
+        <div class="relatorio-item" style="font-weight: bold; background: #3a3a3a; display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 10px;">
             <span>Cliente</span>
-            <span>Total de Cortes</span>
+            <span>Total Cortes</span>
             <span>Pontos</span>
         </div>
     `;
     
-    users.sort((a, b) => b.historico.length - a.historico.length).forEach(user => {
+    users.sort((a, b) => (b.historico ? b.historico.length : 0) - (a.historico ? a.historico.length : 0)).forEach(user => {
         html += `
-            <div class="relatorio-item">
+            <div class="relatorio-item" style="display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 10px; border-bottom: 1px solid #444;">
                 <span>${user.nome}</span>
                 <span>${user.historico ? user.historico.length : 0}</span>
                 <span>${user.pontos}</span>
@@ -693,34 +743,35 @@ function carregarRelatorioCortes(users, periodo) {
     container.innerHTML = html;
 }
 
-// Exportar dados
+// Exportar dados (Async)
 if (document.getElementById('exportClientes')) {
     document.getElementById('exportClientes').addEventListener('click', exportarClientes);
     document.getElementById('exportCortes').addEventListener('click', exportarCortes);
 }
 
-function exportarClientes() {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
+async function exportarClientes() {
+    const users = await getAllUsers();
     const csv = ['Nome,CPF,E-mail,Data Nascimento,Pontos,Total Cortes,Data Cadastro'];
     
     users.forEach(user => {
         const cpfFormatado = user.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
         const dataNascimento = user.dataNascimento ? new Date(user.dataNascimento).toLocaleDateString('pt-BR') : 'N/A';
-        csv.push(`"${user.nome}","${cpfFormatado}","${user.email}","${dataNascimento}",${user.pontos},${user.historico ? user.historico.length : 0},"${new Date(user.dataCadastro).toLocaleDateString('pt-BR')}"`);
+        const dataCadastro = user.dataCadastro ? new Date(user.dataCadastro).toLocaleDateString('pt-BR') : 'N/A';
+        csv.push(`"${user.nome}","'${cpfFormatado}","${user.email}","${dataNascimento}",${user.pontos},${user.historico ? user.historico.length : 0},"${dataCadastro}"`);
     });
     
     downloadCSV(csv.join('\n'), 'clientes_barbearia_style.csv');
 }
 
-function exportarCortes() {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
+async function exportarCortes() {
+    const users = await getAllUsers();
     const csv = ['Data,Hora,Cliente,CPF,Barbeiro'];
     
     users.forEach(user => {
         if (user.historico) {
             user.historico.forEach(corte => {
                 const cpfFormatado = user.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-                csv.push(`"${corte.data}","${corte.hora || ''}","${user.nome}","${cpfFormatado}","${corte.barbeiro || 'N/A'}"`);
+                csv.push(`"${corte.data}","${corte.hora || ''}","${user.nome}","'${cpfFormatado}","${corte.barbeiro || 'N/A'}"`);
             });
         }
     });
@@ -729,7 +780,9 @@ function exportarCortes() {
 }
 
 function downloadCSV(csv, filename) {
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    // Adiciona BOM para garantir a codificação UTF-8 correta no Excel
+    const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+    const blob = new Blob([bom, csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     
@@ -744,9 +797,16 @@ function downloadCSV(csv, filename) {
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', function() {
-    checkAuth();
+    // Verifica se estamos em uma página que precisa de autenticação
+    const isAuthPage = document.getElementById('userName') || 
+                       document.getElementById('barbeiroNome') || 
+                       document.getElementById('reader') ||
+                       document.getElementById('qrcode');
     
-    // Configurar data máxima para data de nascimento (hoje)
+    if (!isAuthPage) {
+        checkAuth(); // Verifica se está logado em index.html ou cadastro.html para redirecionar
+    }
+    
     const dataNascimentoInput = document.getElementById('dataNascimento');
     if (dataNascimentoInput) {
         const hoje = new Date();
@@ -755,12 +815,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const dia = String(hoje.getDate()).padStart(2, '0');
         dataNascimentoInput.max = `${ano}-${mes}-${dia}`;
         
-        // Configurar data mínima para 100 anos atrás
         const anoMin = ano - 100;
         dataNascimentoInput.min = `${anoMin}-${mes}-${dia}`;
     }
     
-    // Debug: Verificar se há dados no localStorage
-    console.log('Usuários no localStorage:', JSON.parse(localStorage.getItem('users') || '[]'));
-    console.log('Barbeiros no localStorage:', JSON.parse(localStorage.getItem('barbeiros') || '[]'));
+    console.log('Sistema de Barbearia (Supabase) inicializado.');
+    // console.log('Usuários no localStorage (cache):', JSON.parse(localStorage.getItem('users') || '[]'));
+    // console.log('Barbeiros no localStorage (cache):', JSON.parse(localStorage.getItem('barbeiros') || '[]'));
 });
