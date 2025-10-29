@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barbearia - Gerenciar Usuários</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .management-list { max-height: 400px; overflow-y: auto; }
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #444;
+        }
+        .list-item-info { flex: 1; }
+        .list-item-info h4 { margin-bottom: 5px; }
+        .list-item-info p { font-size: 0.85rem; color: var(--text-secondary); }
+        .btn-delete {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .btn-delete:hover { background: #c0392b; }
+        .form-cadastro { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        @media (max-width: 768px) {
+            .form-cadastro { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="managementPage">
+        <div class="header">
+            <h1>Gerenciar Usuários</h1>
+            <a href="dashboard-barbeiro.html" class="btn-secondary">Voltar</a>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showManagementTab('clientes')">Clientes</button>
+            <button class="tab-btn" onclick="showManagementTab('barbeiros')">Barbeiros</button>
+        </div>
+
+        <div id="tabClientes" class="management-tab active">
+            <div class="card">
+                <h3>Cadastrar Novo Cliente</h3>
+                <form id="adminCreateClienteForm" class="form-cadastro">
+                    <div class="input-group"><input type="text" id="adminNomeCliente" placeholder="Nome completo" required></div>
+                    <div class="input-group"><input type="text" id="adminCpfCliente" placeholder="CPF" required oninput="formatarCPF(this)" maxlength="14"></div>
+                    <div class="input-group"><input type="email" id="adminEmailCliente" placeholder="E-mail" required></div>
+                    <div class="input-group"><input type="date" id="adminNascCliente" placeholder="Data Nasc." required></div>
+                    <div class="input-group"><input type="password" id="adminSenhaCliente" placeholder="Senha (mín. 6)" required minlength="6"></div>
+                    <button type="submit" class="btn btn-primary">Cadastrar Cliente</button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h3>Clientes Cadastrados</h3>
+                <div id="listaClientes" class="management-list">Carregando...</div>
+            </div>
+        </div>
+        
+        <div id="tabBarbeiros" class="management-tab" style="display: none;">
+            <div class="card">
+                <h3>Cadastrar Novo Barbeiro</h3>
+                <form id="adminCreateBarbeiroForm" class="form-cadastro">
+                    <div class="input-group"><input type="text" id="adminNomeBarbeiro" placeholder="Nome completo" required></div>
+                    <div class="input-group"><input type="email" id="adminEmailBarbeiro" placeholder="E-mail" required></div>
+                    <div class="input-group"><input type="password" id="adminSenhaBarbeiro" placeholder="Senha (mín. 6)" required minlength="6"></div>
+                    <button type="submit" class="btn btn-primary">Cadastrar Barbeiro</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h3>Barbeiros Cadastrados</h3>
+                <div id="listaBarbeiros" class="management-list">Carregando...</div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+    <script src="supabase_config.js"></script>
+    <script src="db.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

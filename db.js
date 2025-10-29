@@ -134,3 +134,73 @@ async function getBarbeiroById(id) {
     }
     return data;
 }
+
+// ===============================================
+// NOVAS FUNÇÕES PARA GERENCIAMENTO (Parte 2)
+// ===============================================
+
+/**
+ * Busca todos os barbeiros.
+ */
+async function getAllBarbeiros() {
+    const { data, error } = await supabaseClient
+        .from('barbeiros')
+        .select('*');
+    
+    if (error) {
+        console.error('Erro ao buscar todos os barbeiros:', error);
+        return [];
+    }
+    return data || [];
+}
+
+/**
+ * Cria um novo barbeiro no banco de dados.
+ */
+async function createNewBarbeiro(newBarbeiro) {
+    const { data, error } = await supabaseClient
+        .from('barbeiros')
+        .insert([newBarbeiro])
+        .select()
+        .single();
+        
+    if (error) {
+        console.error('Erro ao criar novo barbeiro:', error);
+        return null;
+    }
+    return data;
+}
+
+/**
+ * Deleta um usuário pelo ID.
+ */
+async function deleteUser(id) {
+    const { error } = await supabaseClient
+        .from('users')
+        .delete()
+        .eq('id', id);
+    
+    if (error) {
+        console.error('Erro ao deletar usuário:', error);
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Deleta um barbeiro pelo ID.
+ */
+async function deleteBarbeiro(id) {
+    const { error } = await supabaseClient
+        .from('barbeiros')
+        .delete()
+        .eq('id', id);
+    
+    if (error) {
+        console.error('Erro ao deletar barbeiro:', error);
+        return false;
+    }
+    return true;
+}
+
+// NÃO HÁ NENHUM COLCHETE '}' EXTRA AQUI.
