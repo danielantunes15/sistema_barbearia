@@ -328,7 +328,6 @@ if (document.getElementById('barbeiroNome')) {
              console.log('Cliente acessou página de barbeiro, redirecionando...');
              window.location.href = 'dashboard-cliente.html';
         } else {
-            console.log('Barbeiro não autenticado, redirecionando...');
             window.location.href = 'index.html';
         }
     })();
@@ -496,38 +495,6 @@ function calcularFrequencia(historico) {
     } catch(e) {
         return '-';
     }
-}
-
-// QR Code (Async IIFE)
-if (document.getElementById('qrcode')) {
-    (async () => {
-        const auth = await checkAuth();
-        
-        if (auth && auth.tipo === 'cliente') {
-            const user = auth.data;
-            document.getElementById('userId').textContent = user.id;
-            
-            const qrcodeContainer = document.getElementById('qrcode');
-            
-            try {
-                QRCode.toCanvas(qrcodeContainer, user.id, {
-                    width: 200,
-                    margin: 2,
-                    color: { dark: '#000000', light: '#FFFFFF' }
-                }, function(error) {
-                    if (error) {
-                        console.error(error);
-                        showFallbackQRCode(user.id, qrcodeContainer);
-                    }
-                });
-            } catch (error) {
-                console.error('Erro ao gerar QR Code:', error);
-                showFallbackQRCode(user.id, qrcodeContainer);
-            }
-        } else {
-            window.location.href = 'index.html';
-        }
-    })();
 }
 
 function showFallbackQRCode(userId, container) {
@@ -819,7 +786,51 @@ document.addEventListener('DOMContentLoaded', function() {
         dataNascimentoInput.min = `${anoMin}-${mes}-${dia}`;
     }
     
+    // CORREÇÃO: QR Code (Async IIFE) - Movido aqui para garantir que 'QRCode' esteja definido
+    if (document.getElementById('qrcode')) {
+        (async () => {
+            const auth = await checkAuth();
+            
+            if (auth && auth.tipo === 'cliente') {
+                const user = auth.data;
+                document.getElementById('userId').textContent = user.id;
+                
+                const qrcodeContainer = document.getElementById('qrcode');
+                
+                try {
+                    // Usar toDataURL para gerar uma imagem
+                    QRCode.toDataURL(user.id, {
+                        width: 250, // Aumentado para melhor visualização
+                        margin: 2,
+                        color: { dark: '#000000', light: '#FFFFFF' }
+                    }, function(err, url) {
+                        if (err) {
+                            console.error('Erro ao gerar QR Code como Data URL:', err);
+                            showFallbackQRCode(user.id, qrcodeContainer);
+                            return;
+                        }
+                        // Limpa o container e insere a imagem
+                        qrcodeContainer.innerHTML = ''; 
+                        const img = document.createElement('img');
+                        img.src = url;
+                        // Aplicando estilos para visualização "bonita" (borda, fundo branco, padding)
+                        img.style.border = '2px solid #444';
+                        img.style.borderRadius = '15px';
+                        img.style.padding = '15px';
+                        img.style.background = 'white';
+                        img.style.maxWidth = '100%'; // Garantir responsividade
+
+                        qrcodeContainer.appendChild(img);
+                    });
+                } catch (error) {
+                    console.error('Erro geral ao gerar QR Code:', error);
+                    showFallbackQRCode(user.id, qrcodeContainer);
+                }
+            } else {
+                window.location.href = 'index.html';
+            }
+        })();
+    }
+    
     console.log('Sistema de Barbearia (Supabase) inicializado.');
-    // console.log('Usuários no localStorage (cache):', JSON.parse(localStorage.getItem('users') || '[]'));
-    // console.log('Barbeiros no localStorage (cache):', JSON.parse(localStorage.getItem('barbeiros') || '[]'));
 });
