@@ -42,9 +42,10 @@ if (!localStorage.getItem('users')) {
     ];
     
     localStorage.setItem('users', JSON.stringify(initialUsers));
+    console.log('Dados iniciais criados com sucesso!');
 }
 
-// Inicializar barbeiros (mantido igual)
+// Inicializar barbeiros
 if (!localStorage.getItem('barbeiros')) {
     const initialBarbeiros = [
         {
@@ -64,9 +65,10 @@ if (!localStorage.getItem('barbeiros')) {
     ];
     
     localStorage.setItem('barbeiros', JSON.stringify(initialBarbeiros));
+    console.log('Barbeiros iniciais criados com sucesso!');
 }
 
-// Funções auxiliares (mantidas iguais)
+// Funções auxiliares para o "banco de dados"
 function getUserById(id) {
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     return users.find(u => u.id === id);

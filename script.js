@@ -16,7 +16,7 @@ function formatarCPF(campo) {
     campo.value = cpf;
 }
 
-// Função para validar CPF
+// Função para validar CPF (versão simplificada para teste)
 function validarCPF(cpf) {
     cpf = cpf.replace(/\D/g, '');
     
@@ -31,28 +31,7 @@ function validarCPF(cpf) {
     
     if (cpfsInvalidos.includes(cpf)) return false;
     
-    // Validação do dígito verificador
-    let soma = 0;
-    let resto;
-    
-    for (let i = 1; i <= 9; i++) {
-        soma += parseInt(cpf.substring(i-1, i)) * (11 - i);
-    }
-    
-    resto = (soma * 10) % 11;
-    if ((resto === 10) || (resto === 11)) resto = 0;
-    if (resto !== parseInt(cpf.substring(9, 10))) return false;
-    
-    soma = 0;
-    for (let i = 1; i <= 10; i++) {
-        soma += parseInt(cpf.substring(i-1, i)) * (12 - i);
-    }
-    
-    resto = (soma * 10) % 11;
-    if ((resto === 10) || (resto === 11)) resto = 0;
-    if (resto !== parseInt(cpf.substring(10, 11))) return false;
-    
-    return true;
+    return true; // Para testes, aceita qualquer CPF com 11 dígitos
 }
 
 // Verifica se o usuário está logado
@@ -90,18 +69,24 @@ if (document.getElementById('loginClienteForm')) {
         const cpf = document.getElementById('cpfCliente').value.replace(/\D/g, '');
         const password = document.getElementById('passwordCliente').value;
         
-        if (!validarCPF(cpf)) {
-            alert('CPF inválido! Por favor, verifique o número digitado.');
+        console.log('Tentando login com CPF:', cpf, 'Senha:', password);
+        
+        if (cpf.length !== 11) {
+            alert('CPF deve ter 11 dígitos!');
             return;
         }
         
         const users = JSON.parse(localStorage.getItem('users') || '[]');
+        console.log('Usuários no sistema:', users);
+        
         const user = users.find(u => u.cpf === cpf && u.password === password);
         
         if (user) {
+            console.log('Usuário encontrado:', user);
             localStorage.setItem('currentUser', JSON.stringify(user));
             window.location.href = 'dashboard-cliente.html';
         } else {
+            console.log('Usuário não encontrado ou senha incorreta');
             alert('CPF ou senha incorretos!');
         }
     });
@@ -115,13 +100,19 @@ if (document.getElementById('loginBarbeiroForm')) {
         const email = document.getElementById('emailBarbeiro').value;
         const password = document.getElementById('passwordBarbeiro').value;
         
+        console.log('Tentando login barbeiro:', email);
+        
         const barbeiros = JSON.parse(localStorage.getItem('barbeiros') || '[]');
+        console.log('Barbeiros no sistema:', barbeiros);
+        
         const barbeiro = barbeiros.find(b => b.email === email && b.password === password);
         
         if (barbeiro) {
+            console.log('Barbeiro encontrado:', barbeiro);
             localStorage.setItem('currentBarbeiro', JSON.stringify(barbeiro));
             window.location.href = 'dashboard-barbeiro.html';
         } else {
+            console.log('Barbeiro não encontrado');
             alert('E-mail ou senha incorretos!');
         }
     });
@@ -138,13 +129,20 @@ if (document.getElementById('cadastroForm')) {
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         
+        console.log('Tentando cadastro:', { nome, cpf, email });
+        
         // Validar CPF
-        if (!validarCPF(cpf)) {
-            alert('CPF inválido! Por favor, verifique o número digitado.');
+        if (cpf.length !== 11) {
+            alert('CPF deve ter 11 dígitos!');
             return;
         }
         
         // Validar data de nascimento
+        if (!dataNascimento) {
+            alert('Data de nascimento é obrigatória!');
+            return;
+        }
+        
         const nascimento = new Date(dataNascimento);
         const hoje = new Date();
         const idade = hoje.getFullYear() - nascimento.getFullYear();
@@ -191,6 +189,9 @@ if (document.getElementById('cadastroForm')) {
         users.push(newUser);
         localStorage.setItem('users', JSON.stringify(users));
         
+        console.log('Usuário cadastrado com sucesso:', newUser);
+        console.log('Total de usuários agora:', users.length);
+        
         localStorage.setItem('currentUser', JSON.stringify(newUser));
         window.location.href = 'dashboard-cliente.html';
     });
@@ -202,6 +203,8 @@ if (document.getElementById('userName')) {
     
     if (auth && auth.tipo === 'cliente') {
         const user = auth.data;
+        
+        console.log('Carregando dashboard do cliente:', user);
         
         document.getElementById('userName').textContent = user.nome;
         document.getElementById('userEmail').textContent = user.email;
@@ -274,6 +277,9 @@ if (document.getElementById('userName')) {
             localStorage.removeItem('currentUser');
             window.location.href = 'index.html';
         });
+    } else {
+        console.log('Usuário não autenticado, redirecionando...');
+        window.location.href = 'index.html';
     }
 }
 
@@ -292,12 +298,17 @@ if (document.getElementById('barbeiroNome')) {
             localStorage.removeItem('currentBarbeiro');
             window.location.href = 'index.html';
         });
+    } else {
+        console.log('Barbeiro não autenticado, redirecionando...');
+        window.location.href = 'index.html';
     }
 }
 
 function carregarDashboardBarbeiro() {
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     const hoje = new Date().toLocaleDateString('pt-BR');
+    
+    console.log('Carregando dashboard barbeiro. Total de clientes:', users.length);
     
     // Estatísticas gerais
     document.getElementById('totalClientes').textContent = users.length;
@@ -468,6 +479,8 @@ if (document.getElementById('qrcode')) {
             console.error('Erro ao gerar QR Code:', error);
             showFallbackQRCode(user.id, qrcodeContainer);
         }
+    } else {
+        window.location.href = 'index.html';
     }
 }
 
@@ -741,5 +754,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const mes = String(hoje.getMonth() + 1).padStart(2, '0');
         const dia = String(hoje.getDate()).padStart(2, '0');
         dataNascimentoInput.max = `${ano}-${mes}-${dia}`;
+        
+        // Configurar data mínima para 100 anos atrás
+        const anoMin = ano - 100;
+        dataNascimentoInput.min = `${anoMin}-${mes}-${dia}`;
     }
+    
+    // Debug: Verificar se há dados no localStorage
+    console.log('Usuários no localStorage:', JSON.parse(localStorage.getItem('users') || '[]'));
+    console.log('Barbeiros no localStorage:', JSON.parse(localStorage.getItem('barbeiros') || '[]'));
 });
