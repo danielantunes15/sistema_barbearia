@@ -1,44 +1,150 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barbearia - Meu QR Code</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Barbearia - Meu QR Code</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    body {
+      background-color: var(--bg-primary, #111);
+      color: var(--text-primary, #fff);
+      font-family: "Poppins", sans-serif;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 50px auto;
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .btn-secondary {
+      background: #444;
+      color: #fff;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .btn-secondary:hover {
+      background: #666;
+    }
+
+    .card {
+      background: #2a2a2a;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .qrcode-container {
+      margin: 20px auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: white;
+      border-radius: 12px;
+      width: fit-content;
+      padding: 10px;
+    }
+
+    .user-id {
+      margin-top: 10px;
+      font-size: 1.1rem;
+      color: #ccc;
+    }
+
+    .instructions {
+      margin-top: 25px;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Meu QR Code</h1>
-            <a href="dashboard-cliente.html" class="btn-secondary">Voltar</a>
-        </div>
-        
-        <div class="card">
-            <p>Apresente este QR Code ao barbeiro para validar seu corte</p>
-            
-            <div id="qrcode" class="qrcode-container">
-                </div>
-            
-            <p class="user-id">ID do usuário: <span id="userId">Carregando...</span></p>
-        </div>
-        
-        <div class="instructions" style="color: var(--text-secondary); padding: 15px;">
-            <h3>Como funciona:</h3>
-            <ol>
-                <li>Apresente este QR Code ao barbeiro</li>
-                <li>O barbeiro irá escanear o código</li>
-                <li>Seu corte será registrado automaticamente</li>
-                <li>A cada 10 cortes, você ganha 1 corte grátis!</li>
-            </ol>
-        </div>
+  <div class="container">
+    <div class="header">
+      <h1>Meu QR Code</h1>
+      <a href="dashboard-cliente.html" class="btn-secondary">Voltar</a>
     </div>
     
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <div class="card">
+      <p>Apresente este QR Code ao barbeiro para validar seu corte</p>
+      
+      <div id="qrcode" class="qrcode-container">
+        <p>Gerando QR Code...</p>
+      </div>
+      
+      <p class="user-id">ID do usuário: <span id="userId">Carregando...</span></p>
+    </div>
     
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
-    <script src="supabase_config.js"></script>
-    <script src="db.js"></script>
-    <script src="script.js"></script>
+    <div class="instructions" style="color: var(--text-secondary); padding: 15px;">
+      <h3>Como funciona:</h3>
+      <ol>
+        <li>Apresente este QR Code ao barbeiro</li>
+        <li>O barbeiro irá escanear o código</li>
+        <li>Seu corte será registrado automaticamente</li>
+        <li>A cada 10 cortes, você ganha 1 corte grátis!</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- QRCode.js (CDN corrigido e garantido) -->
+  <script>
+    // Testa e tenta recarregar o script caso falhe
+    (function loadQRCodeLib() {
+      const script = document.createElement('script');
+      script.src = "https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js";
+      script.onload = () => console.log("✅ Biblioteca QRCode carregada com sucesso.");
+      script.onerror = () => {
+        console.error("❌ Falha ao carregar QRCode.js. Tentando fallback...");
+        // Tenta um segundo CDN
+        const fallback = document.createElement('script');
+        fallback.src = "https://unpkg.com/qrcode/build/qrcode.min.js";
+        fallback.onload = () => console.log("✅ QRCode carregado pelo fallback.");
+        fallback.onerror = () => console.error("❌ Falha total ao carregar QRCode.js!");
+        document.head.appendChild(fallback);
+      };
+      document.head.appendChild(script);
+    })();
+  </script>
+
+  <!-- Dependências -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+  <script src="supabase_config.js"></script>
+  <script src="db.js"></script>
+  <script src="script.js"></script>
+
+  <script>
+    // Função adicional para verificar carregamento da lib
+    document.addEventListener("DOMContentLoaded", () => {
+      setTimeout(() => {
+        if (typeof QRCode === "undefined") {
+          console.warn("⚠️ QRCode.js ainda não carregado. O sistema tentará o modo de fallback.");
+          const container = document.getElementById("qrcode");
+          container.innerHTML = `
+            <div style="text-align: center; padding: 20px;">
+              <p>Falha ao carregar QR Code.</p>
+              <p>Mostre este ID ao barbeiro:</p>
+              <strong style="font-size: 1.2rem; color: var(--accent, #f39c12);">user_1</strong>
+            </div>
+          `;
+        }
+      }, 3000);
+    });
+  </script>
 </body>
 </html>
