@@ -27,9 +27,21 @@
             font-size: 0.8rem;
         }
         .btn-delete:hover { background: #c0392b; }
-        .form-cadastro { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        
+        /* ATUALIZADO: Formulário de cadastro com 2 colunas */
+        .form-cadastro { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 15px; 
+        }
+        .form-cadastro .btn {
+            /* Faz o botão ocupar as 2 colunas */
+            grid-column: span 2;
+        }
+        
         @media (max-width: 768px) {
             .form-cadastro { grid-template-columns: 1fr; }
+            .form-cadastro .btn { grid-column: span 1; }
         }
     </style>
 </head>
@@ -53,7 +65,7 @@
                     <div class="input-group"><input type="text" id="adminCpfCliente" placeholder="CPF" required oninput="formatarCPF(this)" maxlength="14"></div>
                     <div class="input-group"><input type="email" id="adminEmailCliente" placeholder="E-mail" required></div>
                     <div class="input-group"><input type="date" id="adminNascCliente" placeholder="Data Nasc." required></div>
-                    <div class="input-group"><input type="password" id="adminSenhaCliente" placeholder="Senha (mín. 6)" required minlength="6"></div>
+                    <div class="input-group"><input type="password" id="adminSenhaCliente" placeholder="Senha (mín. 6)" required minlength="6" style="grid-column: span 2;"></div>
                     <button type="submit" class="btn btn-primary">Cadastrar Cliente</button>
                 </form>
             </div>
@@ -69,11 +81,12 @@
                 <h3>Cadastrar Novo Barbeiro</h3>
                 <form id="adminCreateBarbeiroForm" class="form-cadastro">
                     <div class="input-group"><input type="text" id="adminNomeBarbeiro" placeholder="Nome completo" required></div>
+                    <div class="input-group"><input type="text" id="adminCpfBarbeiro" placeholder="CPF" required oninput="formatarCPF(this)" maxlength="14"></div>
                     <div class="input-group"><input type="email" id="adminEmailBarbeiro" placeholder="E-mail" required></div>
                     <div class="input-group"><input type="password" id="adminSenhaBarbeiro" placeholder="Senha (mín. 6)" required minlength="6"></div>
                     <button type="submit" class="btn btn-primary">Cadastrar Barbeiro</button>
                 </form>
-            </div>
+                </div>
 
             <div class="card">
                 <h3>Barbeiros Cadastrados</h3>

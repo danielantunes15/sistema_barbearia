@@ -39,6 +39,7 @@ async function getUserByCpfAndPassword(cpf, hashedPassword) {
 
 /**
  * Busca um barbeiro pelo Email e SENHA HASHED.
+ * (Esta função não é mais usada para login, mas mantida)
  */
 async function getBarbeiroByEmailAndPassword(email, hashedPassword) {
     const { data, error } = await supabaseClient
@@ -53,6 +54,24 @@ async function getBarbeiroByEmailAndPassword(email, hashedPassword) {
     }
     return data;
 }
+
+/**
+ * NOVO: Busca um barbeiro pelo CPF e SENHA HASHED.
+ */
+async function getBarbeiroByCpfAndPassword(cpf, hashedPassword) {
+    const { data, error } = await supabaseClient
+        .from('barbeiros')
+        .select('*')
+        .eq('cpf', cpf) // Alterado de email para cpf
+        .eq('password', hashedPassword) // Compara com o hash
+        .single();
+    
+    if (error && error.code !== 'PGRST116') {
+        console.error('Erro ao buscar barbeiro por CPF/Senha:', error);
+    }
+    return data;
+}
+
 
 /**
  * Verifica se um email ou CPF já existe na tabela de usuários.
@@ -70,6 +89,23 @@ async function emailOrCpfExists(email, cpf) {
     
     return data.length > 0;
 }
+
+/**
+ * NOVO: Verifica se um email ou CPF já existe na tabela de barbeiros.
+ */
+async function barbeiroCpfOrEmailExists(email, cpf) {
+    const { data, error } = await supabaseClient
+        .from('barbeiros')
+        .select('id')
+        .or(`email.eq.${email},cpf.eq.${cpf}`);
+    
+    if (error) {
+        console.error('Erro ao verificar email/cpf do barbeiro:', error);
+        return true; // Assume que existe para evitar falha
+    }
+    return data.length > 0;
+}
+
 
 /**
  * Cria um novo usuário no banco de dados.
@@ -202,5 +238,3 @@ async function deleteBarbeiro(id) {
     }
     return true;
 }
-
-// NÃO HÁ NENHUM COLCHETE '}' EXTRA AQUI.

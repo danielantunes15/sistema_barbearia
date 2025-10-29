@@ -111,20 +111,25 @@ if (document.getElementById('loginClienteForm')) {
     });
 }
 
-// Login Barbeiro (Async + Hash)
+// Login Barbeiro (Async + Hash) - ATUALIZADO PARA USAR CPF
 if (document.getElementById('loginBarbeiroForm')) {
     document.getElementById('loginBarbeiroForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        const email = document.getElementById('emailBarbeiro').value;
+        const cpf = document.getElementById('cpfBarbeiro').value.replace(/\D/g, ''); // ATUALIZADO
         const password = document.getElementById('passwordBarbeiro').value;
         
-        console.log('Tentando login barbeiro:', email);
+        console.log('Tentando login barbeiro com CPF:', cpf); // ATUALIZADO
         
+        if (cpf.length !== 11) { // NOVO
+            alert('CPF deve ter 11 dígitos!');
+            return;
+        }
+
         const hashedPassword = hashPassword(password);
         if (!hashedPassword) return;
 
-        const barbeiro = await getBarbeiroByEmailAndPassword(email, hashedPassword);
+        const barbeiro = await getBarbeiroByCpfAndPassword(cpf, hashedPassword); // ATUALIZADO
         
         if (barbeiro) {
             console.log('Barbeiro encontrado:', barbeiro);
@@ -132,7 +137,7 @@ if (document.getElementById('loginBarbeiroForm')) {
             window.location.href = 'dashboard-barbeiro.html';
         } else {
             console.log('Barbeiro não encontrado');
-            alert('E-mail ou senha incorretos!');
+            alert('CPF ou senha incorretos!'); // ATUALIZADO
         }
     });
 }
@@ -857,7 +862,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ===============================================
-// LÓGICA PARA gerenciar-usuarios.html
+// LÓGICA PARA gerenciar-usuarios.html (ATUALIZADO)
 // ===============================================
 
 // Função para trocar abas no painel de gerenciamento
@@ -929,26 +934,37 @@ if (document.getElementById('managementPage')) {
             }
         });
         
-        // 4. Adicionar listener para criar barbeiro
+        // 4. Adicionar listener para criar barbeiro (ATUALIZADO COM CPF)
         document.getElementById('adminCreateBarbeiroForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const nome = document.getElementById('adminNomeBarbeiro').value;
+            const cpf = document.getElementById('adminCpfBarbeiro').value.replace(/\D/g, ''); // NOVO
             const email = document.getElementById('adminEmailBarbeiro').value;
             const password = document.getElementById('adminSenhaBarbeiro').value;
 
-            if (!nome || !email || !password) {
+            if (!nome || !cpf || !email || !password) { // ATUALIZADO
                 alert('Preencha todos os campos!');
+                return;
+            }
+            if (cpf.length !== 11 || !validarCPF(cpf)) { // NOVO
+                alert('CPF inválido!');
                 return;
             }
             if (password.length < 6) {
                 alert('A senha deve ter pelo menos 6 caracteres.');
                 return;
             }
+            
+            // NOVO: Verifica se CPF ou Email do barbeiro já existem
+            if (await barbeiroCpfOrEmailExists(email, cpf)) {
+                alert('Este CPF ou E-mail de barbeiro já está cadastrado!');
+                return;
+            }
 
             const hashedPassword = hashPassword(password);
             const newBarbeiro = {
                 id: 'barbeiro_' + Date.now(),
-                nome, email, password: hashedPassword,
+                nome, cpf, email, password: hashedPassword, // ATUALIZADO
                 dataCadastro: new Date().toISOString()
             };
 
@@ -965,7 +981,7 @@ if (document.getElementById('managementPage')) {
     })();
 }
 
-// Função para carregar e recarregar as listas de usuários e barbeiros
+// Função para carregar e recarregar as listas de usuários e barbeiros (ATUALIZADO)
 async function loadManagementLists() {
     const listaClientes = document.getElementById('listaClientes');
     const listaBarbeiros = document.getElementById('listaBarbeiros');
@@ -992,7 +1008,7 @@ async function loadManagementLists() {
         listaClientes.appendChild(item);
     });
 
-    // Carregar Barbeiros
+    // Carregar Barbeiros (ATUALIZADO para mostrar CPF)
     const barbeiros = await getAllBarbeiros();
     listaBarbeiros.innerHTML = '';
     barbeiros.forEach(barb => {
@@ -1001,7 +1017,7 @@ async function loadManagementLists() {
         item.innerHTML = `
             <div class="list-item-info">
                 <h4>${barb.nome}</h4>
-                <p>Email: ${barb.email}</p>
+                <p>CPF: ${barb.cpf || 'N/A'} | Email: ${barb.email}</p>
             </div>
             <button class="btn-delete" data-id="${barb.id}" data-tipo="barbeiro">Excluir</button>
         `;
