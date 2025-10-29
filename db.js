@@ -7,11 +7,17 @@ if (!localStorage.getItem('users')) {
             email: 'joao@example.com',
             telefone: '(11) 99999-9999',
             password: '123456',
-            pontos: 3,
+            pontos: 8,
+            dataCadastro: '2023-01-15',
             historico: [
-                { data: '15/03/2023', tipo: 'corte' },
-                { data: '01/04/2023', tipo: 'corte' },
-                { data: '20/04/2023', tipo: 'corte' }
+                { data: '15/01/2023', hora: '10:30', tipo: 'corte', barbeiro: 'Carlos' },
+                { data: '01/02/2023', hora: '14:00', tipo: 'corte', barbeiro: 'Carlos' },
+                { data: '20/02/2023', hora: '11:15', tipo: 'corte', barbeiro: 'Carlos' },
+                { data: '10/03/2023', hora: '16:30', tipo: 'corte', barbeiro: 'Carlos' },
+                { data: '28/03/2023', hora: '09:45', tipo: 'corte', barbeiro: 'Carlos' },
+                { data: '15/04/2023', hora: '13:20', tipo: 'corte', barbeiro: 'Carlos' },
+                { data: '30/04/2023', hora: '15:10', tipo: 'corte', barbeiro: 'Carlos' },
+                { data: '18/05/2023', hora: '10:00', tipo: 'corte', barbeiro: 'Carlos' }
             ]
         },
         {
@@ -20,20 +26,63 @@ if (!localStorage.getItem('users')) {
             email: 'maria@example.com',
             telefone: '(11) 98888-8888',
             password: '123456',
-            pontos: 7,
+            pontos: 6,
+            dataCadastro: '2023-02-10',
             historico: [
-                { data: '10/02/2023', tipo: 'corte' },
-                { data: '25/02/2023', tipo: 'corte' },
-                { data: '12/03/2023', tipo: 'corte' },
-                { data: '28/03/2023', tipo: 'corte' },
-                { data: '15/04/2023', tipo: 'corte' },
-                { data: '30/04/2023', tipo: 'corte' },
-                { data: '18/05/2023', tipo: 'corte' }
+                { data: '10/02/2023', hora: '11:00', tipo: 'corte', barbeiro: 'Carlos' },
+                { data: '25/02/2023', hora: '14:30', tipo: 'corte', barbeiro: 'Carlos' },
+                { data: '12/03/2023', hora: '10:15', tipo: 'corte', barbeiro: 'Carlos' },
+                { data: '28/03/2023', hora: '16:45', tipo: 'corte', barbeiro: 'Carlos' },
+                { data: '15/04/2023', hora: '13:00', tipo: 'corte', barbeiro: 'Carlos' },
+                { data: '30/04/2023', hora: '15:30', tipo: 'corte', barbeiro: 'Carlos' }
+            ]
+        },
+        {
+            id: 'user_3',
+            nome: 'Pedro Oliveira',
+            email: 'pedro@example.com',
+            telefone: '(11) 97777-7777',
+            password: '123456',
+            pontos: 10,
+            dataCadastro: '2023-01-20',
+            historico: [
+                { data: '20/01/2023', hora: '09:00', tipo: 'corte', barbeiro: 'Carlos' },
+                { data: '05/02/2023', hora: '14:15', tipo: 'corte', barbeiro: 'Carlos' },
+                { data: '22/02/2023', hora: '11:30', tipo: 'corte', barbeiro: 'Carlos' },
+                { data: '10/03/2023', hora: '16:00', tipo: 'corte', barbeiro: 'Carlos' },
+                { data: '25/03/2023', hora: '10:45', tipo: 'corte', barbeiro: 'Carlos' },
+                { data: '08/04/2023', hora: '13:15', tipo: 'corte', barbeiro: 'Carlos' },
+                { data: '20/04/2023', hora: '15:45', tipo: 'corte', barbeiro: 'Carlos' },
+                { data: '05/05/2023', hora: '09:30', tipo: 'corte', barbeiro: 'Carlos' },
+                { data: '18/05/2023', hora: '14:00', tipo: 'corte', barbeiro: 'Carlos' },
+                { data: '30/05/2023', hora: '11:00', tipo: 'corte', barbeiro: 'Carlos' }
             ]
         }
     ];
     
     localStorage.setItem('users', JSON.stringify(initialUsers));
+}
+
+// Inicializar barbeiros
+if (!localStorage.getItem('barbeiros')) {
+    const initialBarbeiros = [
+        {
+            id: 'barbeiro_1',
+            nome: 'Carlos Silva',
+            email: 'carlos@barbearia.com',
+            password: '123456',
+            dataCadastro: '2023-01-01'
+        },
+        {
+            id: 'barbeiro_2',
+            nome: 'Ricardo Santos',
+            email: 'ricardo@barbearia.com',
+            password: '123456',
+            dataCadastro: '2023-01-01'
+        }
+    ];
+    
+    localStorage.setItem('barbeiros', JSON.stringify(initialBarbeiros));
 }
 
 // Funções auxiliares para o "banco de dados"
@@ -53,4 +102,9 @@ function updateUser(user) {
     }
     
     return false;
+}
+
+function getBarbeiroById(id) {
+    const barbeiros = JSON.parse(localStorage.getItem('barbeiros') || '[]');
+    return barbeiros.find(b => b.id === id);
 }
