@@ -1,12 +1,13 @@
 /* danielantunes15/sistema_barbearia/sistema_barbearia-197d2932e7e3d39489bf9472ce2a71471b9e3a99/db.js */
 
 // Funções auxiliares para o banco de dados Supabase
+// CORREÇÃO: Todas as chamadas usam 'supabaseClient' (definido em supabase_config.js)
 
 /**
  * Busca um usuário pelo ID.
  */
 async function getUserById(id) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('users')
         .select('*')
         .eq('id', id)
@@ -23,7 +24,7 @@ async function getUserById(id) {
  * Busca um usuário pelo CPF e SENHA HASHED.
  */
 async function getUserByCpfAndPassword(cpf, hashedPassword) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('users')
         .select('*')
         .eq('cpf', cpf)
@@ -40,7 +41,7 @@ async function getUserByCpfAndPassword(cpf, hashedPassword) {
  * Busca um barbeiro pelo Email e SENHA HASHED.
  */
 async function getBarbeiroByEmailAndPassword(email, hashedPassword) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('barbeiros')
         .select('*')
         .eq('email', email)
@@ -57,7 +58,7 @@ async function getBarbeiroByEmailAndPassword(email, hashedPassword) {
  * Verifica se um email ou CPF já existe na tabela de usuários.
  */
 async function emailOrCpfExists(email, cpf) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('users')
         .select('id, email, cpf')
         .or(`email.eq.${email},cpf.eq.${cpf}`);
@@ -74,7 +75,7 @@ async function emailOrCpfExists(email, cpf) {
  * Cria um novo usuário no banco de dados.
  */
 async function createNewUser(newUser) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('users')
         .insert([newUser])
         .select()
@@ -91,7 +92,7 @@ async function createNewUser(newUser) {
  * Atualiza um usuário existente (baseado no ID).
  */
 async function updateUser(user) {
-    const { error } = await supabase
+    const { error } = await supabaseClient
         .from('users')
         .update(user)
         .eq('id', user.id);
@@ -107,7 +108,7 @@ async function updateUser(user) {
  * Busca todos os usuários.
  */
 async function getAllUsers() {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('users')
         .select('*');
     
@@ -122,7 +123,7 @@ async function getAllUsers() {
  * Busca um barbeiro pelo ID.
  */
 async function getBarbeiroById(id) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('barbeiros')
         .select('*')
         .eq('id', id)

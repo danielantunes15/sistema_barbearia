@@ -4,7 +4,8 @@ const SUPABASE_URL = 'https://qsnktcvfobwwtwqnqlgz.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFzbmt0Y3Zmb2J3d3R3cW5xbGd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3NzI1NjMsImV4cCI6MjA3NzM0ODU2M30.pAZZOFeMIcfGat5ubSmcPlhw3pXGBOP5CG6Q3m1TfjM';
 
 // Inicializa o cliente Supabase
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// CORREÇÃO: Usamos o 'supabase' global do CDN e salvamos como 'supabaseClient'
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /**
  * Função auxiliar para criar um hash SHA-256 da senha.
@@ -30,7 +31,8 @@ function hashPassword(password) {
  */
 async function initializeSupabaseData() {
     console.log('Verificando dados iniciais no Supabase...');
-    const { data: userData } = await supabase.from('users').select('id').limit(1);
+    // CORREÇÃO: Usar supabaseClient
+    const { data: userData } = await supabaseClient.from('users').select('id').limit(1);
 
     if (userData.length === 0) {
         console.log('Inicializando dados no Supabase...');
@@ -41,7 +43,8 @@ async function initializeSupabaseData() {
             { id: 'barbeiro_1', nome: 'Carlos Silva', email: 'carlos@barbearia.com', password: HASHED_PASS, dataCadastro: '2023-01-01' },
             { id: 'barbeiro_2', nome: 'Ricardo Santos', email: 'ricardo@barbearia.com', password: HASHED_PASS, dataCadastro: '2023-01-01' }
         ];
-        await supabase.from('barbeiros').insert(initialBarbeiros, { onConflict: 'id' });
+        // CORREÇÃO: Usar supabaseClient
+        await supabaseClient.from('barbeiros').insert(initialBarbeiros, { onConflict: 'id' });
 
         const initialUsers = [
             {
@@ -69,7 +72,8 @@ async function initializeSupabaseData() {
                 ]
             }
         ];
-        await supabase.from('users').insert(initialUsers, { onConflict: 'id' });
+        // CORREÇÃO: Usar supabaseClient
+        await supabaseClient.from('users').insert(initialUsers, { onConflict: 'id' });
         console.log('Dados iniciais criados com sucesso no Supabase!');
     } else {
         console.log('O banco de dados Supabase já contém dados.');
