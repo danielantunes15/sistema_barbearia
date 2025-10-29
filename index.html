@@ -3,56 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barbearia - Login Cliente</title>
+    <title>Barbearia Style - Login</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <div class="container">
-        <div class="logo">
-            <h1>Barbearia</h1>
-            <p>Programa de Fidelidade</p>
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-header">
+            <div class="logo-container">
+                <img src="images/style.png" alt="Barbearia Style" class="logo-img" onerror="this.style.display='none'">
+                <div class="logo-text">
+                    <h1>Barbearia Style</h1>
+                    <p>Estilo que transforma</p>
+                </div>
+            </div>
         </div>
         
         <div class="tabs">
-            <button class="tab-btn active" onclick="showTab('cliente')">Cliente</button>
-            <button class="tab-btn" onclick="showTab('barbeiro')">Barbeiro</button>
+            <button class="tab-btn active" onclick="showTab('cliente')">
+                <span class="tab-icon">👤</span>
+                Cliente
+            </button>
+            <button class="tab-btn" onclick="showTab('barbeiro')">
+                <span class="tab-icon">💈</span>
+                Barbeiro
+            </button>
         </div>
         
-        <form id="loginClienteForm" class="form active">
-            <h2>Login Cliente</h2>
+        <div class="forms-container">
+            <form id="loginClienteForm" class="login-form active">
+                <h2>Acesse sua conta</h2>
+                
+                <div class="input-group">
+                    <div class="input-icon">📧</div>
+                    <input type="email" id="emailCliente" placeholder="Seu e-mail" required>
+                </div>
+                
+                <div class="input-group">
+                    <div class="input-icon">🔒</div>
+                    <input type="password" id="passwordCliente" placeholder="Sua senha" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    <span class="btn-icon">→</span>
+                    Entrar como Cliente
+                </button>
+                
+                <div class="login-footer">
+                    <p>Não tem uma conta? <a href="cadastro.html" class="link">Cadastre-se</a></p>
+                </div>
+            </form>
             
-            <div class="input-group">
-                <label for="emailCliente">E-mail</label>
-                <input type="email" id="emailCliente" required>
-            </div>
-            
-            <div class="input-group">
-                <label for="passwordCliente">Senha</label>
-                <input type="password" id="passwordCliente" required>
-            </div>
-            
-            <button type="submit" class="btn">Entrar como Cliente</button>
-            
-            <p class="link">
-                Não tem uma conta? <a href="cadastro.html">Cadastre-se</a>
-            </p>
-        </form>
+            <form id="loginBarbeiroForm" class="login-form">
+                <h2>Acesso Barbeiro</h2>
+                
+                <div class="input-group">
+                    <div class="input-icon">📧</div>
+                    <input type="email" id="emailBarbeiro" placeholder="E-mail profissional" required>
+                </div>
+                
+                <div class="input-group">
+                    <div class="input-icon">🔒</div>
+                    <input type="password" id="passwordBarbeiro" placeholder="Senha de acesso" required>
+                </div>
+                
+                <button type="submit" class="btn btn-barbeiro">
+                    <span class="btn-icon">💈</span>
+                    Entrar como Barbeiro
+                </button>
+            </form>
+        </div>
         
-        <form id="loginBarbeiroForm" class="form">
-            <h2>Login Barbeiro</h2>
-            
-            <div class="input-group">
-                <label for="emailBarbeiro">E-mail</label>
-                <input type="email" id="emailBarbeiro" required>
+        <div class="login-features">
+            <div class="feature">
+                <span class="feature-icon">✂️</span>
+                <span>Cortes Premium</span>
             </div>
-            
-            <div class="input-group">
-                <label for="passwordBarbeiro">Senha</label>
-                <input type="password" id="passwordBarbeiro" required>
+            <div class="feature">
+                <span class="feature-icon">🎯</span>
+                <span>Fidelidade Style</span>
             </div>
-            
-            <button type="submit" class="btn btn-barbeiro">Entrar como Barbeiro</button>
-        </form>
+            <div class="feature">
+                <span class="feature-icon">⭐</span>
+                <span>Experiência Única</span>
+            </div>
+        </div>
     </div>
     
     <script src="db.js"></script>
