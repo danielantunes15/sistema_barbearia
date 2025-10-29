@@ -18,9 +18,10 @@ function checkAuth() {
 // Tabs no login
 function showTab(tab) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelectorAll('.form').forEach(form => form.classList.remove('active'));
+    document.querySelectorAll('.login-form').forEach(form => form.classList.remove('active'));
     
-    document.querySelector(`.tab-btn:nth-child(${tab === 'cliente' ? 1 : 2})`).classList.add('active');
+    const tabIndex = tab === 'cliente' ? 0 : 1;
+    document.querySelectorAll('.tab-btn')[tabIndex].classList.add('active');
     document.getElementById(tab === 'cliente' ? 'loginClienteForm' : 'loginBarbeiroForm').classList.add('active');
 }
 
@@ -225,7 +226,7 @@ function carregarDashboardBarbeiro() {
             containerProximos.appendChild(div);
         });
     } else {
-        containerProximos.innerHTML = '<p style="text-align: center; color: #7f8c8d;">Nenhum cliente próximo da fidelidade</p>';
+        containerProximos.innerHTML = '<p style="text-align: center; color: #b3b3b3;">Nenhum cliente próximo da fidelidade</p>';
     }
     
     // Todos os clientes
@@ -254,15 +255,17 @@ function carregarDashboardBarbeiro() {
     });
     
     // Busca de clientes
-    document.getElementById('searchClient').addEventListener('input', function(e) {
-        const termo = e.target.value.toLowerCase();
-        const clientesItems = containerTodos.querySelectorAll('.cliente-item');
-        
-        clientesItems.forEach(item => {
-            const texto = item.textContent.toLowerCase();
-            item.style.display = texto.includes(termo) ? 'flex' : 'none';
+    if (document.getElementById('searchClient')) {
+        document.getElementById('searchClient').addEventListener('input', function(e) {
+            const termo = e.target.value.toLowerCase();
+            const clientesItems = containerTodos.querySelectorAll('.cliente-item');
+            
+            clientesItems.forEach(item => {
+                const texto = item.textContent.toLowerCase();
+                item.style.display = texto.includes(termo) ? 'flex' : 'none';
+            });
         });
-    });
+    }
     
     // Estatísticas de frequência
     carregarEstatisticasFrequencia(users);
@@ -270,6 +273,7 @@ function carregarDashboardBarbeiro() {
 
 function carregarEstatisticasFrequencia(users) {
     const container = document.getElementById('estatisticasFrequencia');
+    if (!container) return;
     
     // Clientes mais frequentes (últimos 30 dias)
     const trintaDiasAtras = new Date();
@@ -298,7 +302,7 @@ function carregarEstatisticasFrequencia(users) {
             `;
         });
     } else {
-        html += '<p style="text-align: center; color: #7f8c8d;">Nenhum corte nos últimos 30 dias</p>';
+        html += '<p style="text-align: center; color: #b3b3b3;">Nenhum corte nos últimos 30 dias</p>';
     }
     
     container.innerHTML = html;
@@ -323,7 +327,7 @@ function calcularFrequencia(historico) {
     return 'Baixa';
 }
 
-// QR Code (mantido igual)
+// QR Code
 if (document.getElementById('qrcode')) {
     const auth = checkAuth();
     
@@ -357,20 +361,20 @@ if (document.getElementById('qrcode')) {
 function showFallbackQRCode(userId, container) {
     container.innerHTML = `
         <div style="text-align: center; padding: 20px;">
-            <div style="background: white; padding: 20px; border-radius: 10px; border: 2px solid #ddd; display: inline-block;">
+            <div style="background: white; padding: 20px; border-radius: 10px; border: 2px solid #444; display: inline-block;">
                 <h3 style="color: #333; margin-bottom: 15px;">ID do Usuário</h3>
                 <div style="font-size: 18px; font-weight: bold; background: #f8f9fa; padding: 15px; border-radius: 5px; letter-spacing: 2px;">
                     ${userId}
                 </div>
             </div>
-            <p style="color: #666; margin-top: 15px;">
+            <p style="color: #b3b3b3; margin-top: 15px;">
                 Mostre este código ao barbeiro caso o QR Code não funcione
             </p>
         </div>
     `;
 }
 
-// Scanner (mantido similar, com ajustes para barbeiro)
+// Scanner
 if (document.getElementById('reader')) {
     let html5QrcodeScanner;
     
@@ -460,6 +464,152 @@ if (document.getElementById('reader')) {
     function onScanFailure(error) {
         // Ignorar erros de varredura
     }
+}
+
+// Relatórios
+if (document.getElementById('aplicarFiltro')) {
+    document.getElementById('aplicarFiltro').addEventListener('click', function() {
+        carregarRelatorios();
+    });
+    
+    // Carregar relatórios inicialmente
+    carregarRelatorios();
+}
+
+function carregarRelatorios() {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const periodo = document.getElementById('periodo').value;
+    
+    // Clientes mais frequentes
+    const clientesFrequentes = users.map(user => ({
+        ...user,
+        totalCortes: user.historico ? user.historico.length : 0
+    })).sort((a, b) => b.totalCortes - a.totalCortes)
+      .slice(0, 5);
+    
+    const containerFrequentes = document.getElementById('clientesFrequentes');
+    if (containerFrequentes) {
+        containerFrequentes.innerHTML = '';
+        clientesFrequentes.forEach((cliente, index) => {
+            const div = document.createElement('div');
+            div.className = 'ranking-item';
+            div.innerHTML = `
+                <span>${index + 1}. ${cliente.nome}</span>
+                <span>${cliente.totalCortes} cortes</span>
+            `;
+            containerFrequentes.appendChild(div);
+        });
+    }
+    
+    // Horários mais movimentados
+    carregarHorariosMovimento(users);
+    
+    // Relatório de cortes
+    carregarRelatorioCortes(users, periodo);
+}
+
+function carregarHorariosMovimento(users) {
+    const horarios = {};
+    
+    users.forEach(user => {
+        if (user.historico) {
+            user.historico.forEach(corte => {
+                if (corte.hora) {
+                    const hora = corte.hora.split(':')[0];
+                    horarios[hora] = (horarios[hora] || 0) + 1;
+                }
+            });
+        }
+    });
+    
+    const horariosOrdenados = Object.entries(horarios)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+    
+    const containerHorarios = document.getElementById('horariosMovimento');
+    if (containerHorarios) {
+        containerHorarios.innerHTML = '';
+        horariosOrdenados.forEach(([hora, quantidade]) => {
+            const div = document.createElement('div');
+            div.className = 'horario-item';
+            div.innerHTML = `
+                <span>${hora}h</span>
+                <span>${quantidade} cortes</span>
+            `;
+            containerHorarios.appendChild(div);
+        });
+    }
+}
+
+function carregarRelatorioCortes(users, periodo) {
+    const container = document.getElementById('relatorioCortes');
+    if (!container) return;
+    
+    let html = `
+        <div class="relatorio-item" style="font-weight: bold; background: #3a3a3a;">
+            <span>Cliente</span>
+            <span>Total de Cortes</span>
+            <span>Pontos</span>
+        </div>
+    `;
+    
+    users.sort((a, b) => b.historico.length - a.historico.length).forEach(user => {
+        html += `
+            <div class="relatorio-item">
+                <span>${user.nome}</span>
+                <span>${user.historico ? user.historico.length : 0}</span>
+                <span>${user.pontos}</span>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+// Exportar dados
+if (document.getElementById('exportClientes')) {
+    document.getElementById('exportClientes').addEventListener('click', exportarClientes);
+    document.getElementById('exportCortes').addEventListener('click', exportarCortes);
+}
+
+function exportarClientes() {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const csv = ['Nome,E-mail,Telefone,Pontos,Total Cortes,Data Cadastro'];
+    
+    users.forEach(user => {
+        csv.push(`"${user.nome}","${user.email}","${user.telefone}",${user.pontos},${user.historico ? user.historico.length : 0},"${new Date(user.dataCadastro).toLocaleDateString('pt-BR')}"`);
+    });
+    
+    downloadCSV(csv.join('\n'), 'clientes_barbearia_style.csv');
+}
+
+function exportarCortes() {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const csv = ['Data,Hora,Cliente,Barbeiro'];
+    
+    users.forEach(user => {
+        if (user.historico) {
+            user.historico.forEach(corte => {
+                csv.push(`"${corte.data}","${corte.hora || ''}","${user.nome}","${corte.barbeiro || 'N/A'}"`);
+            });
+        }
+    });
+    
+    downloadCSV(csv.join('\n'), 'cortes_barbearia_style.csv');
+}
+
+function downloadCSV(csv, filename) {
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 // Inicialização
