@@ -1,3 +1,60 @@
+// Função para formatar CPF
+function formatarCPF(campo) {
+    let cpf = campo.value.replace(/\D/g, '');
+    
+    if (cpf.length > 11) {
+        cpf = cpf.substring(0, 11);
+    }
+    
+    // Formata o CPF
+    if (cpf.length <= 11) {
+        cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
+        cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
+        cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    }
+    
+    campo.value = cpf;
+}
+
+// Função para validar CPF
+function validarCPF(cpf) {
+    cpf = cpf.replace(/\D/g, '');
+    
+    if (cpf.length !== 11) return false;
+    
+    // Verifica CPFs conhecidos como inválidos
+    const cpfsInvalidos = [
+        '00000000000', '11111111111', '22222222222',
+        '33333333333', '44444444444', '55555555555',
+        '66666666666', '77777777777', '88888888888', '99999999999'
+    ];
+    
+    if (cpfsInvalidos.includes(cpf)) return false;
+    
+    // Validação do dígito verificador
+    let soma = 0;
+    let resto;
+    
+    for (let i = 1; i <= 9; i++) {
+        soma += parseInt(cpf.substring(i-1, i)) * (11 - i);
+    }
+    
+    resto = (soma * 10) % 11;
+    if ((resto === 10) || (resto === 11)) resto = 0;
+    if (resto !== parseInt(cpf.substring(9, 10))) return false;
+    
+    soma = 0;
+    for (let i = 1; i <= 10; i++) {
+        soma += parseInt(cpf.substring(i-1, i)) * (12 - i);
+    }
+    
+    resto = (soma * 10) % 11;
+    if ((resto === 10) || (resto === 11)) resto = 0;
+    if (resto !== parseInt(cpf.substring(10, 11))) return false;
+    
+    return true;
+}
+
 // Verifica se o usuário está logado
 function checkAuth() {
     const currentUser = localStorage.getItem('currentUser');
@@ -25,22 +82,27 @@ function showTab(tab) {
     document.getElementById(tab === 'cliente' ? 'loginClienteForm' : 'loginBarbeiroForm').classList.add('active');
 }
 
-// Login Cliente
+// Login Cliente com CPF
 if (document.getElementById('loginClienteForm')) {
     document.getElementById('loginClienteForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const email = document.getElementById('emailCliente').value;
+        const cpf = document.getElementById('cpfCliente').value.replace(/\D/g, '');
         const password = document.getElementById('passwordCliente').value;
         
+        if (!validarCPF(cpf)) {
+            alert('CPF inválido! Por favor, verifique o número digitado.');
+            return;
+        }
+        
         const users = JSON.parse(localStorage.getItem('users') || '[]');
-        const user = users.find(u => u.email === email && u.password === password);
+        const user = users.find(u => u.cpf === cpf && u.password === password);
         
         if (user) {
             localStorage.setItem('currentUser', JSON.stringify(user));
             window.location.href = 'dashboard-cliente.html';
         } else {
-            alert('E-mail ou senha incorretos!');
+            alert('CPF ou senha incorretos!');
         }
     });
 }
@@ -65,23 +127,47 @@ if (document.getElementById('loginBarbeiroForm')) {
     });
 }
 
-// Cadastro Cliente
+// Cadastro Cliente com CPF e Data Nascimento
 if (document.getElementById('cadastroForm')) {
     document.getElementById('cadastroForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
         const nome = document.getElementById('nome').value;
+        const dataNascimento = document.getElementById('dataNascimento').value;
+        const cpf = document.getElementById('cpf').value.replace(/\D/g, '');
         const email = document.getElementById('email').value;
-        const telefone = document.getElementById('telefone').value;
         const password = document.getElementById('password').value;
+        
+        // Validar CPF
+        if (!validarCPF(cpf)) {
+            alert('CPF inválido! Por favor, verifique o número digitado.');
+            return;
+        }
+        
+        // Validar data de nascimento
+        const nascimento = new Date(dataNascimento);
+        const hoje = new Date();
+        const idade = hoje.getFullYear() - nascimento.getFullYear();
+        
+        if (idade < 16) {
+            alert('É necessário ter pelo menos 16 anos para se cadastrar.');
+            return;
+        }
+        
+        // Validar senha
+        if (password.length < 6) {
+            alert('A senha deve ter pelo menos 6 caracteres.');
+            return;
+        }
         
         const userId = 'user_' + Date.now();
         
         const newUser = {
             id: userId,
             nome: nome,
+            dataNascimento: dataNascimento,
+            cpf: cpf,
             email: email,
-            telefone: telefone,
             password: password,
             pontos: 0,
             historico: [],
@@ -90,6 +176,13 @@ if (document.getElementById('cadastroForm')) {
         
         const users = JSON.parse(localStorage.getItem('users') || '[]');
         
+        // Verificar se o CPF já existe
+        if (users.find(u => u.cpf === cpf)) {
+            alert('Este CPF já está cadastrado!');
+            return;
+        }
+        
+        // Verificar se o e-mail já existe
         if (users.find(u => u.email === email)) {
             alert('Este e-mail já está cadastrado!');
             return;
@@ -103,7 +196,7 @@ if (document.getElementById('cadastroForm')) {
     });
 }
 
-// Dashboard Cliente
+// Dashboard Cliente (Atualizado para mostrar CPF)
 if (document.getElementById('userName')) {
     const auth = checkAuth();
     
@@ -112,7 +205,23 @@ if (document.getElementById('userName')) {
         
         document.getElementById('userName').textContent = user.nome;
         document.getElementById('userEmail').textContent = user.email;
-        document.getElementById('userTelefone').textContent = user.telefone;
+        
+        // Formatar e mostrar CPF
+        const cpfFormatado = user.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+        document.getElementById('userTelefone').textContent = `CPF: ${cpfFormatado}`;
+        
+        // Calcular e mostrar idade se tiver data de nascimento
+        if (user.dataNascimento) {
+            const nascimento = new Date(user.dataNascimento);
+            const hoje = new Date();
+            let idade = hoje.getFullYear() - nascimento.getFullYear();
+            const mes = hoje.getMonth() - nascimento.getMonth();
+            if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
+                idade--;
+            }
+            document.getElementById('userTelefone').textContent += ` | Idade: ${idade} anos`;
+        }
+        
         document.getElementById('currentPoints').textContent = user.pontos;
         
         // Calcular estatísticas
@@ -143,6 +252,8 @@ if (document.getElementById('userName')) {
         
         // Preencher histórico
         const historyList = document.getElementById('historyList');
+        historyList.innerHTML = '';
+        
         if (user.historico && user.historico.length > 0) {
             user.historico.slice(0, 10).forEach(corte => {
                 const li = document.createElement('li');
@@ -166,7 +277,7 @@ if (document.getElementById('userName')) {
     }
 }
 
-// Dashboard Barbeiro
+// Dashboard Barbeiro (Atualizado para mostrar CPF dos clientes)
 if (document.getElementById('barbeiroNome')) {
     const auth = checkAuth();
     
@@ -211,12 +322,13 @@ function carregarDashboardBarbeiro() {
     
     if (clientesProximos.length > 0) {
         clientesProximos.forEach(cliente => {
+            const cpfFormatado = cliente.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
             const div = document.createElement('div');
             div.className = 'cliente-item';
             div.innerHTML = `
                 <div class="cliente-info">
                     <h4>${cliente.nome}</h4>
-                    <p>${cliente.email} • ${cliente.telefone}</p>
+                    <p>${cpfFormatado} • ${cliente.email}</p>
                 </div>
                 <div class="cliente-stats">
                     <span class="pontos-badge alto">${cliente.pontos}/10 pontos</span>
@@ -238,12 +350,13 @@ function carregarDashboardBarbeiro() {
         if (cliente.pontos >= 8) badgeClass = 'alto';
         else if (cliente.pontos >= 5) badgeClass = 'medio';
         
+        const cpfFormatado = cliente.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
         const div = document.createElement('div');
         div.className = 'cliente-item';
         div.innerHTML = `
             <div class="cliente-info">
                 <h4>${cliente.nome}</h4>
-                <p>${cliente.email} • ${cliente.telefone}</p>
+                <p>${cpfFormatado} • ${cliente.email}</p>
                 <p style="font-size: 0.8rem;">Cadastro: ${new Date(cliente.dataCadastro).toLocaleDateString('pt-BR')}</p>
             </div>
             <div class="cliente-stats">
@@ -439,6 +552,7 @@ if (document.getElementById('reader')) {
             resultContainer.innerHTML = `
                 <h3>✅ Corte registrado com sucesso!</h3>
                 <p><strong>Cliente:</strong> ${user.nome}</p>
+                <p><strong>CPF:</strong> ${user.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')}</p>
                 <p><strong>Pontos atuais:</strong> ${user.pontos}/10</p>
                 <p><strong>Data:</strong> ${dataAtual} ${horaAtual}</p>
                 ${user.pontos >= 10 ? '<p class="success">🎉 Parabéns! Este cliente tem direito a um corte grátis!</p>' : ''}
@@ -574,10 +688,12 @@ if (document.getElementById('exportClientes')) {
 
 function exportarClientes() {
     const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const csv = ['Nome,E-mail,Telefone,Pontos,Total Cortes,Data Cadastro'];
+    const csv = ['Nome,CPF,E-mail,Data Nascimento,Pontos,Total Cortes,Data Cadastro'];
     
     users.forEach(user => {
-        csv.push(`"${user.nome}","${user.email}","${user.telefone}",${user.pontos},${user.historico ? user.historico.length : 0},"${new Date(user.dataCadastro).toLocaleDateString('pt-BR')}"`);
+        const cpfFormatado = user.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+        const dataNascimento = user.dataNascimento ? new Date(user.dataNascimento).toLocaleDateString('pt-BR') : 'N/A';
+        csv.push(`"${user.nome}","${cpfFormatado}","${user.email}","${dataNascimento}",${user.pontos},${user.historico ? user.historico.length : 0},"${new Date(user.dataCadastro).toLocaleDateString('pt-BR')}"`);
     });
     
     downloadCSV(csv.join('\n'), 'clientes_barbearia_style.csv');
@@ -585,12 +701,13 @@ function exportarClientes() {
 
 function exportarCortes() {
     const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const csv = ['Data,Hora,Cliente,Barbeiro'];
+    const csv = ['Data,Hora,Cliente,CPF,Barbeiro'];
     
     users.forEach(user => {
         if (user.historico) {
             user.historico.forEach(corte => {
-                csv.push(`"${corte.data}","${corte.hora || ''}","${user.nome}","${corte.barbeiro || 'N/A'}"`);
+                const cpfFormatado = user.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+                csv.push(`"${corte.data}","${corte.hora || ''}","${user.nome}","${cpfFormatado}","${corte.barbeiro || 'N/A'}"`);
             });
         }
     });
@@ -615,4 +732,14 @@ function downloadCSV(csv, filename) {
 // Inicialização
 document.addEventListener('DOMContentLoaded', function() {
     checkAuth();
+    
+    // Configurar data máxima para data de nascimento (hoje)
+    const dataNascimentoInput = document.getElementById('dataNascimento');
+    if (dataNascimentoInput) {
+        const hoje = new Date();
+        const ano = hoje.getFullYear();
+        const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+        const dia = String(hoje.getDate()).padStart(2, '0');
+        dataNascimentoInput.max = `${ano}-${mes}-${dia}`;
+    }
 });
