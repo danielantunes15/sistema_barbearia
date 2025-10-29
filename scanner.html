@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barbearia - Scanner</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Scanner</h1>
+            <a href="index.html" class="btn-secondary">Sair</a>
+        </div>
+        
+        <div class="card">
+            <p>Posicione o QR Code do cliente dentro da área de leitura</p>
+            
+            <div id="reader" class="scanner-container">
+                <!-- O scanner será inicializado via JavaScript -->
+            </div>
+            
+            <div id="result" class="result-container">
+                <!-- Resultado da leitura será exibido aqui -->
+            </div>
+        </div>
+        
+        <div class="actions">
+            <button id="startScanner" class="btn">Iniciar Scanner</button>
+            <button id="stopScanner" class="btn-secondary" style="display:none;">Parar Scanner</button>
+        </div>
+    </div>
+    
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="db.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

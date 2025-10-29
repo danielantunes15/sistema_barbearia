@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barbearia - Meu QR Code</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Meu QR Code</h1>
+            <a href="dashboard.html" class="btn-secondary">Voltar</a>
+        </div>
+        
+        <div class="card">
+            <p>Apresente este QR Code ao barbeiro para validar seu corte</p>
+            
+            <div id="qrcode" class="qrcode-container">
+                <!-- QR Code será gerado via JavaScript -->
+            </div>
+            
+            <p class="user-id">ID do usuário: <span id="userId"></span></p>
+        </div>
+        
+        <div class="instructions">
+            <h3>Como funciona:</h3>
+            <ol>
+                <li>Apresente este QR Code ao barbeiro</li>
+                <li>O barbeiro irá escanear o código</li>
+                <li>Seu corte será registrado automaticamente</li>
+                <li>A cada 10 cortes, você ganha 1 corte grátis!</li>
+            </ol>
+        </div>
+    </div>
+    
+    <!-- Usando uma biblioteca QR Code mais simples e confiável -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+    <script src="db.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
