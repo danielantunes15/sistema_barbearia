@@ -854,7 +854,8 @@ if (document.getElementById('reader')) {
                 `;
             } else {
                  // Esta mensagem indica a falha na atualização de pontos (updateUser falhou)
-                 resultContainer.innerHTML = '<p>❌ Erro ao atualizar pontos/fidelidade do cliente. Verifique as permissões de UPDATE no Supabase (RLS)!</p>';
+                 console.error('❌ Falha ao atualizar pontos. Verifique o console para mais detalhes.');
+                 resultContainer.innerHTML = '<p>❌ Falha ao atualizar pontos/fidelidade do cliente. Veja o console para detalhes.</p>';
                  resultContainer.className = 'result-container error';
             }
         } else {

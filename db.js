@@ -77,23 +77,44 @@ async function createNewUser(newUser) {
 }
 
 /**
- * Atualiza um usuário existente (baseado no ID).
+ * Atualiza os dados de um usuário na tabela "users"
+ * Evita atualizar campos bloqueados como "password" ou "historico"
  */
 async function updateUser(user) {
-    // ATUALIZADO: Garante que 'historico' não seja enviado
-    const { historico, ...userWithoutHistorico } = user;
-    
-    const { error } = await supabaseClient
-        .from('users')
-        .update(userWithoutHistorico)
-        .eq('id', userWithoutHistorico.id);
-    
-    if (error) {
-        console.error('Erro ao atualizar usuário:', error);
+    try {
+        // Remove campos que o Supabase não permite alterar diretamente
+        const { historico, password, ...userData } = user;
+
+        // Garante que o ID foi passado
+        if (!userData.id) {
+            console.error('❌ updateUser: ID do usuário ausente.');
+            alert('Erro interno: ID do usuário não encontrado.');
+            return false;
+        }
+
+        console.log('🟦 Atualizando usuário no Supabase:', userData);
+
+        const { data, error } = await supabaseClient
+            .from('users')
+            .update(userData)
+            .eq('id', userData.id);
+
+        if (error) {
+            console.error('❌ Erro Supabase ao atualizar usuário:', error);
+            alert('Erro Supabase ao atualizar: ' + error.message);
+            return false;
+        }
+
+        console.log('✅ Usuário atualizado com sucesso:', data);
+        return true;
+
+    } catch (err) {
+        console.error('❌ Erro inesperado em updateUser:', err);
+        alert('Erro inesperado: ' + err.message);
         return false;
     }
-    return true;
 }
+
 
 /**
  * Busca todos os usuários.
