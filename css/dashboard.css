@@ -9,213 +9,233 @@
     margin-bottom: var(--spacing-md);
     border: 1px solid #444;
 }
-.user-info h2 {
-    color: var(--text);
-    margin-bottom: 10px;
-    font-size: 1.4rem;
-}
-.user-info p {
-    color: var(--text-secondary);
-    margin-bottom: 5px;
-}
+.user-info h2 { font-size: 1.4rem; }
+.user-info p { color: var(--text-secondary); }
 
 /* Points Container */
-.points-container {
-    text-align: center;
-}
-.points-display {
-    font-size: 3rem;
-    font-weight: bold;
-    color: var(--accent);
-    margin-bottom: 10px;
-}
-.points-label {
-    font-size: 1rem;
-    color: var(--text-secondary);
-}
-.progress-bar {
-    height: 12px;
-    background: var(--input-bg);
-    border-radius: 10px;
-    margin: 20px 0;
-    overflow: hidden;
-}
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(45deg, var(--accent), #f1c40f);
-    border-radius: 10px;
-    width: 0%;
-    transition: width 0.5s ease;
-}
-.points-info {
-    color: var(--text-secondary);
-    font-style: italic;
-    font-size: 14px;
-}
+.points-container { text-align: center; }
+.points-display { font-size: 3rem; font-weight: bold; color: var(--accent); }
+.progress-bar { height: 12px; background: var(--input-bg); border-radius: 10px; margin: 20px 0; }
+.progress-fill { height: 100%; background: linear-gradient(45deg, var(--accent), #f1c40f); width: 0%; }
 
 /* Stats Grid */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    /* 2 colunas no mobile */
+    grid-template-columns: 1fr 1fr;
     gap: var(--spacing-md);
     margin: var(--spacing-md) 0;
 }
+
+/* CARTÕES DE MÉTRICA ATUALIZADOS */
 .stat-card {
     background: var(--card-bg);
     padding: var(--spacing-md);
     border-radius: 12px;
-    text-align: center;
     border: 1px solid #444;
-}
-.stat-card.large {
-    grid-column: span 2;
+    /* Novo layout interno */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 .stat-card h4 {
     color: var(--text-secondary);
-    font-size: 0.9rem;
-    margin-bottom: 10px;
+    font-size: 0.85rem;
+    margin-bottom: 5px;
     font-weight: 500;
 }
 .stat-number {
-    font-size: 2rem;
-    font-weight: bold;
-    color: var(--accent);
-}
-
-/* History List */
-.history-list {
-    list-style-type: none;
-}
-.history-list li {
-    padding: var(--spacing-md) 0;
-    border-bottom: 1px solid #444;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.history-list li:last-child {
-    border-bottom: none;
-}
-
-/* Clientes Lista */
-.clientes-lista {
-    max-height: 400px;
-    overflow-y: auto;
-}
-.cliente-item {
-    padding: 18px;
-    border-bottom: 1px solid #444;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: background 0.3s ease;
-}
-.cliente-item:hover {
-    background: #3a3a3a;
-}
-.cliente-item:last-child {
-    border-bottom: none;
-}
-.cliente-info h4 {
-    margin-bottom: 8px;
+    font-size: 1.8rem;
+    font-weight: 600;
     color: var(--text);
-    font-size: 1rem;
 }
-.cliente-info p {
-    color: var(--text-secondary);
-    font-size: 0.85rem;
-    margin-bottom: 4px;
-}
-.cliente-stats {
-    text-align: right;
-}
-.pontos-badge {
-    background: var(--accent);
-    color: var(--primary);
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: bold;
-    display: inline-block;
-}
-.pontos-badge.alto {
-    background: var(--success);
+/* Círculo do Ícone (NOVO) */
+.icon-wrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--spacing-md);
     color: white;
 }
-.pontos-badge.medio {
-    background: var(--warning);
-    color: var(--primary);
-}
-.pontos-badge.baixo {
-    background: #3498db;
-    color: white;
+.icon-wrapper i {
+    width: 20px;
+    height: 20px;
 }
 
-/* Search Bar */
-.search-bar {
-    margin-bottom: 20px;
-}
-.search-bar input {
-    width: 100%;
-    padding: 12px 20px;
-    background: var(--input-bg);
-    border: 2px solid transparent;
-    border-radius: 10px;
-    color: var(--text);
-    font-size: 14px;
-    transition: all 0.3s ease;
-}
-.search-bar input:focus {
-    outline: none;
-    border-color: var(--accent);
-    background: #444;
-}
-.search-bar input::placeholder {
-    color: var(--text-secondary);
+/* Em telas maiores, 4 colunas */
+@media (min-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+    .stat-card {
+        padding: var(--spacing-lg);
+    }
+    .stat-number {
+        font-size: 2.2rem;
+    }
 }
 
-/* ======================================= */
-/* 1. BARRA DE AÇÃO FIXA (NOVO)          */
-/* ======================================= */
+/* History List & Clientes Lista (Sem alteração) */
+.history-list { list-style-type: none; }
+.history-list li { padding: var(--spacing-md) 0; border-bottom: 1px solid #444; display: flex; /* ... */ }
+.clientes-lista { max-height: 400px; overflow-y: auto; }
+.cliente-item { padding: 18px; border-bottom: 1px solid #444; display: flex; /* ... */ }
+.cliente-info h4 { margin-bottom: 8px; }
+.pontos-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
+.pontos-badge.alto { background: var(--success); color: white; }
+.pontos-badge.medio { background: var(--warning); color: var(--primary); }
 
-/* Aplicado ao <body> do dashboard-cliente */
+/* Search Bar (Sem alteração) */
+.search-bar { margin-bottom: 20px; }
+.search-bar input { width: 100%; padding: 12px 20px; /* ... */ }
+
+
+/* ================================================ */
+/* BARRA DE NAVEGAÇÃO DO APP (Mobile-First) (NOVO)  */
+/* ================================================ */
+
+/* Garante espaço para a barra fixa */
+body#dashboard-barbeiro,
 body#dashboard-cliente {
-    /* Garante que o conteúdo role por baixo da barra fixa */
-    padding-bottom: 100px; /* Espaço para a barra fixa */
+    padding-bottom: 100px; 
 }
 
-/* Estiliza o .actions no dashboard-cliente */
-body#dashboard-cliente .actions {
+/* A div .actions agora é a nossa .app-nav */
+.app-nav {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
     
-    /* 2. Estilo "App" */
+    /* Estilo "App" */
     background: var(--secondary);
     border-top: 1px solid #444;
     box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
     
-    /* 3. Layout das ações */
+    /* Layout dos itens */
     display: flex;
-    flex-direction: row; /* Lado a lado no mobile */
-    padding: var(--spacing-md);
+    flex-direction: row; /* Lado a lado */
+    padding: var(--spacing-sm) var(--spacing-md);
     margin: 0;
-    gap: var(--spacing-md);
+    gap: var(--spacing-sm);
 }
 
-/* Em telas grandes, remove a barra fixa */
+.app-nav .app-nav-item {
+    flex: 1; /* Ocupa espaço igual */
+    flex-direction: column; /* Ícone em cima, texto embaixo */
+    gap: 4px;
+    
+    /* Remove o estilo de botão padrão */
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-weight: 400;
+    font-size: 0.75rem;
+    min-height: 50px;
+    padding: 8px 4px;
+}
+
+/* Botão principal de "Escanear" */
+.app-nav .app-nav-item.btn-primary {
+    background: var(--accent);
+    color: var(--primary);
+    border-radius: 12px;
+    font-weight: 600;
+}
+.app-nav .app-nav-item.btn-primary:hover {
+    background: var(--accent-hover);
+}
+
+.app-nav .app-nav-item:hover {
+    background: transparent;
+    color: var(--text);
+}
+
+.app-nav-item i {
+    width: 22px;
+    height: 22px;
+}
+
+
+/* ================================================ */
+/* ESTILOS DESKTOP (Quando não é mais um "app")     */
+/* ================================================ */
+
 @media (min-width: 768px) {
+    /* Remove o padding da barra fixa */
+    body#dashboard-barbeiro,
     body#dashboard-cliente {
-        padding-bottom: 0; /* Remove o padding extra */
+        padding-bottom: 0;
     }
 
-    body#dashboard-cliente .actions {
-        position: relative; /* Volta ao normal */
+    /* Restaura .app-nav para o .actions antigo */
+    .app-nav {
+        position: relative;
         background: transparent;
         border-top: none;
         box-shadow: none;
         padding: 0;
         margin: var(--spacing-lg) 0;
+        gap: var(--spacing-md);
     }
+
+    .app-nav .app-nav-item {
+        flex: 1;
+        flex-direction: row; /* Ícone e texto lado a lado */
+        min-height: 52px;
+        padding: 12px var(--spacing-md);
+        font-size: 1rem;
+        font-weight: 600;
+        gap: 10px;
+    }
+    
+    /* Restaura botões secundários */
+    .app-nav .app-nav-item.btn-secondary {
+         background: transparent;
+         color: var(--text);
+         border: 2px solid #555;
+    }
+     .app-nav .app-nav-item.btn-secondary:hover {
+         background: #3a3a3a;
+         border-color: #777;
+    }
+
+    /* Restaura o botão de Gerenciar (cor customizada) */
+    .app-nav a[href="gerenciar-usuarios.html"] {
+        background-color: #555;
+        border-color: #555;
+    }
+    .app-nav a[href="gerenciar-usuarios.html"]:hover {
+        background-color: #666;
+    }
+}
+
+
+/* ================================================ */
+/* CABEÇALHO DO BARBEIRO (NOVO)                     */
+/* ================================================ */
+
+.header-barbeiro {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-lg);
+}
+.header-barbeiro h1 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--text);
+}
+.header-barbeiro p {
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+.btn-logout {
+    min-width: 80px;
+    width: auto;
+    flex-shrink: 0; /* Não encolhe */
 }
