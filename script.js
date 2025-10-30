@@ -737,11 +737,16 @@ if (document.getElementById('reader')) {
                 resultContainer.className = 'result-container success'; // Muda temporariamente para sucesso/informação
                 
                 // Habilita/Desabilita Corte Grátis
+                const temCorteGratis = user.pontos >= 10 || user.cortesGratis > 0;
                 const optionGratis = tipoCorteSelect.querySelector('option[value="corte_gratis"]');
-                
-                if (user.pontos >= 10 || (user.cortesGratis > 0 && user.pontos < 10)) {
-                    optionGratis.textContent = `Corte Grátis (Acumulado: ${user.cortesGratis + (user.pontos >= 10 ? 1 : 0)})`;
+                const totalGratis = (user.cortesGratis || 0) + (user.pontos >= 10 ? 1 : 0);
+
+                if (temCorteGratis) {
+                    optionGratis.textContent = `Corte Grátis (Acumulado: ${totalGratis})`;
                     optionGratis.disabled = false;
+                    // *** AJUSTE PARA O FLUXO MAIS INTUITIVO ***
+                    tipoCorteSelect.value = 'corte_gratis'; 
+                    // ****************************************
                 } else {
                     optionGratis.textContent = 'Corte Grátis (Pontos Insuficientes)';
                     optionGratis.disabled = true;
@@ -752,8 +757,8 @@ if (document.getElementById('reader')) {
                     <h3>Cliente Escaneado: ${user.nome}</h3>
                     <p><strong>CPF:</strong> ${cpfFormatado}</p>
                     <p><strong>Pontos:</strong> ${user.pontos}/10</p>
-                    ${user.cortesGratis > 0 || user.pontos >= 10 ? 
-                        `<p class="success" style="font-weight: bold;">🎉 Cliente tem direito a ${user.cortesGratis + (user.pontos >= 10 ? 1 : 0)} corte(s) grátis.</p>` : ''}
+                    ${temCorteGratis ? 
+                        `<p class="success" style="font-weight: bold;">🎉 Cliente tem direito a ${totalGratis} corte(s) grátis.</p>` : ''}
                 `;
                 
             } else {
@@ -804,7 +809,7 @@ if (document.getElementById('reader')) {
             
             // Se atingir 10 pontos (chegou no 10º corte)
             if (userToUpdate.pontos >= 10) {
-                // Adiciona o corte grátis (será 1)
+                // Concede o corte grátis (será 1)
                 userToUpdate.cortesGratis = (userToUpdate.cortesGratis || 0) + Math.floor(userToUpdate.pontos / 10);
                 // Reseta os pontos para o resto da divisão (10 % 10 = 0)
                 userToUpdate.pontos = userToUpdate.pontos % 10;
@@ -813,8 +818,10 @@ if (document.getElementById('reader')) {
         } else if (tipoCorte === 'corte_gratis') {
             // Lógica de resgate (funciona para 10 pontos ou cortesGratis acumulados)
             if (userToUpdate.pontos >= 10) {
+                // Se resgatar usando os 10 pontos atuais, zera os pontos.
                 userToUpdate.pontos = 0;
             } else if (userToUpdate.cortesGratis > 0) {
+                // Se resgatar usando o estoque acumulado, decrementa o estoque.
                 userToUpdate.cortesGratis = userToUpdate.cortesGratis - 1;
             } else {
                  alert('Erro: Cliente não tem cortes grátis para resgatar.');
@@ -842,6 +849,7 @@ if (document.getElementById('reader')) {
                     <p><strong>Novo Saldo de Pontos:</strong> ${userToUpdate.pontos}/10</p>
                     <p><strong>Cortes Grátis Acumulados:</strong> ${userToUpdate.cortesGratis}</p>
                     <p><strong>Data:</strong> ${now.toLocaleDateString('pt-BR')} ${now.toLocaleTimeString('pt-BR')}</p>
+                    ${tipoCorte === 'corte_gratis' ? '<p class="success">🎉 Corte grátis resgatado! Novo ciclo iniciado ou estoque atualizado.</p>' : ''}
                     ${userToUpdate.pontos === 0 && tipoCorte === 'corte_pago' ? '<p class="success">🎉 Cliente ganhou um corte grátis e começou novo ciclo!</p>' : ''}
                 `;
             } else {
@@ -1111,7 +1119,6 @@ function downloadCSV(csv, filename) {
     link.setAttribute('href', url);
     link.setAttribute('download', filename);
     link.style.visibility = 'hidden';
-    
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
