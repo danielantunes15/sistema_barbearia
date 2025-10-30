@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Barbearia - Meu QR Code</title>
+  
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/dashboard.css">
 
@@ -41,6 +42,7 @@
       border-radius: 12px;
       width: fit-content;
       padding: 10px;
+      min-height: 250px; /* Adicionado para evitar pulos */
     }
     .user-id {
       margin-top: 10px;
@@ -71,7 +73,7 @@
       <p class="user-id">ID do usuário: <span id="userId">Carregando...</span></p>
     </div>
     
-    <div class="instructions">
+    <div class="instructions" style="color: var(--text-secondary); padding: 15px;">
       <h3>Como funciona:</h3>
       <ol>
         <li>Apresente este QR Code ao barbeiro</li>
@@ -87,16 +89,28 @@
       const script = document.createElement('script');
       script.src = "https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js";
       
+      // CHAMA A FUNÇÃO CORRETA QUANDO A BIBLIOTECA É CARREGADA
       script.onload = () => {
           console.log("✅ Biblioteca QRCode carregada com sucesso.");
-          // O main.js agora cuidará de chamar initQRCodePage()
+          // CORREÇÃO: Chama a nova função (initQRCodePage)
+          if (typeof initQRCodePage !== 'undefined') {
+              initQRCodePage();
+          }
       };
       
       script.onerror = () => {
         console.error("❌ Falha ao carregar QRCode.js. Tentando fallback...");
         const fallback = document.createElement('script');
         fallback.src = "https://unpkg.com/qrcode/build/qrcode.min.js";
-        fallback.onload = () => console.log("✅ QRCode carregado pelo fallback.");
+        
+        fallback.onload = () => {
+             console.log("✅ QRCode carregado pelo fallback.");
+             // CORREÇÃO: Chama a nova função (initQRCodePage)
+             if (typeof initQRCodePage !== 'undefined') {
+                  initQRCodePage();
+             }
+        };
+        
         fallback.onerror = () => console.error("❌ Falha total ao carregar QRCode.js!");
         document.head.appendChild(fallback);
       };
@@ -106,7 +120,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
-    
+  
   <script src="js/config.js"></script>
   <script src="js/api.js"></script>
   <script src="js/utils.js"></script>
