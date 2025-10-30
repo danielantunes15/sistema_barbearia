@@ -21,19 +21,15 @@
 /* Stats Grid */
 .stats-grid {
     display: grid;
-    /* 2 colunas no mobile */
     grid-template-columns: 1fr 1fr;
     gap: var(--spacing-md);
     margin: var(--spacing-md) 0;
 }
-
-/* CARTÕES DE MÉTRICA ATUALIZADOS */
 .stat-card {
     background: var(--card-bg);
     padding: var(--spacing-md);
     border-radius: 12px;
     border: 1px solid #444;
-    /* Novo layout interno */
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -49,7 +45,6 @@
     font-weight: 600;
     color: var(--text);
 }
-/* Círculo do Ícone (NOVO) */
 .icon-wrapper {
     width: 40px;
     height: 40px;
@@ -60,22 +55,14 @@
     margin-bottom: var(--spacing-md);
     color: white;
 }
-.icon-wrapper i {
-    width: 20px;
-    height: 20px;
-}
+.icon-wrapper i { width: 20px; height: 20px; }
 
-/* Em telas maiores, 4 colunas */
 @media (min-width: 768px) {
     .stats-grid {
         grid-template-columns: 1fr 1fr 1fr 1fr;
     }
-    .stat-card {
-        padding: var(--spacing-lg);
-    }
-    .stat-number {
-        font-size: 2.2rem;
-    }
+    .stat-card { padding: var(--spacing-lg); }
+    .stat-number { font-size: 2.2rem; }
 }
 
 /* History List & Clientes Lista (Sem alteração) */
@@ -92,43 +79,32 @@
 .search-bar { margin-bottom: 20px; }
 .search-bar input { width: 100%; padding: 12px 20px; /* ... */ }
 
-
 /* ================================================ */
-/* BARRA DE NAVEGAÇÃO DO APP (Mobile-First) (NOVO)  */
+/* BARRA DE NAVEGAÇÃO DO APP (Mobile-First) */
 /* ================================================ */
 
-/* Garante espaço para a barra fixa */
 body#dashboard-barbeiro,
 body#dashboard-cliente {
     padding-bottom: 100px; 
 }
-
-/* A div .actions agora é a nossa .app-nav */
 .app-nav {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    
-    /* Estilo "App" */
     background: var(--secondary);
     border-top: 1px solid #444;
     box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
-    
-    /* Layout dos itens */
     display: flex;
-    flex-direction: row; /* Lado a lado */
+    flex-direction: row;
     padding: var(--spacing-sm) var(--spacing-md);
     margin: 0;
     gap: var(--spacing-sm);
 }
-
 .app-nav .app-nav-item {
-    flex: 1; /* Ocupa espaço igual */
-    flex-direction: column; /* Ícone em cima, texto embaixo */
+    flex: 1;
+    flex-direction: column;
     gap: 4px;
-    
-    /* Remove o estilo de botão padrão */
     background: transparent;
     border: none;
     color: var(--text-secondary);
@@ -137,36 +113,12 @@ body#dashboard-cliente {
     min-height: 50px;
     padding: 8px 4px;
 }
-
-/* ****** REMOVIDO ****** */
-/* Não há mais estilo especial para btn-primary no mobile */
-/*
-.app-nav .app-nav-item.btn-primary { ... }
-*/
-
-.app-nav .app-nav-item:hover {
-    background: transparent;
-    color: var(--text);
-}
-
-.app-nav-item i {
-    width: 22px;
-    height: 22px;
-}
-
-
-/* ================================================ */
-/* ESTILOS DESKTOP (Quando não é mais um "app")     */
-/* ================================================ */
+.app-nav .app-nav-item:hover { background: transparent; color: var(--text); }
+.app-nav-item i { width: 22px; height: 22px; }
 
 @media (min-width: 768px) {
-    /* Remove o padding da barra fixa */
     body#dashboard-barbeiro,
-    body#dashboard-cliente {
-        padding-bottom: 0;
-    }
-
-    /* Restaura .app-nav para o .actions antigo */
+    body#dashboard-cliente { padding-bottom: 0; }
     .app-nav {
         position: relative;
         background: transparent;
@@ -176,19 +128,15 @@ body#dashboard-cliente {
         margin: var(--spacing-lg) 0;
         gap: var(--spacing-md);
     }
-
     .app-nav .app-nav-item {
         flex: 1;
-        flex-direction: row; /* Ícone e texto lado a lado */
+        flex-direction: row;
         min-height: 52px;
         padding: 12px var(--spacing-md);
         font-size: 1rem;
         font-weight: 600;
         gap: 10px;
     }
-    
-    /* Restaura botões secundários */
-    /* Agora todos os botões no .app-nav terão esse estilo no desktop */
     .app-nav .app-nav-item.btn-secondary {
          background: transparent;
          color: var(--text);
@@ -198,37 +146,145 @@ body#dashboard-cliente {
          background: #3a3a3a;
          border-color: #777;
     }
-
-    /* ****** REMOVIDO ****** */
-    /* Não há mais estilo especial para gerenciar-usuarios */
-    /*
-    .app-nav a[href="gerenciar-usuarios.html"] { ... }
-    */
 }
 
-
 /* ================================================ */
-/* CABEÇALHO DO BARBEIRO (NOVO)                     */
+/* CABEÇALHO DO BARBEIRO */
 /* ================================================ */
-
 .header-barbeiro {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: var(--spacing-lg);
 }
-.header-barbeiro h1 {
-    font-size: 1.8rem;
-    font-weight: 600;
-    line-height: 1.2;
-    color: var(--text);
+.header-barbeiro h1 { font-size: 1.8rem; font-weight: 600; line-height: 1.2; }
+.header-barbeiro p { font-size: 1rem; color: var(--text-secondary); }
+.btn-logout { min-width: 80px; width: auto; flex-shrink: 0; }
+
+/* ================================================ */
+/* NOVOS ESTILOS - PÁGINA RELATÓRIOS */
+/* ================================================ */
+body#relatorios-page .stats-grid {
+    grid-template-columns: 1fr 1fr 1fr; /* 3 colunas sempre */
 }
-.header-barbeiro p {
-    font-size: 1rem;
+body#relatorios-page .stat-number {
+    font-size: 1.5rem;
+}
+
+/* Grid para os rankings */
+.ranking-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* 1 coluna no mobile */
+    gap: var(--spacing-md);
+    margin: var(--spacing-md) 0;
+}
+@media (min-width: 768px) {
+    .ranking-grid {
+        grid-template-columns: 1fr 1fr; /* 2 colunas no desktop */
+    }
+}
+@media (min-width: 1024px) {
+    .ranking-grid {
+        grid-template-columns: 1fr 1fr 1fr; /* 3 colunas no desktop grande */
+    }
+}
+
+/* Estilo do Card de Ranking */
+.ranking-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+.ranking-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid #444;
+}
+.ranking-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.ranking-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+.ranking-info h4 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+.ranking-pos {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    width: 25px; /* Alinhamento */
+}
+.ranking-detalhe {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--accent);
+    white-space: nowrap;
+}
+/* Ícones nos títulos dos cards de relatório */
+.card h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.card h3 i {
+    width: 20px;
+    height: 20px;
+    color: var(--accent);
+}
+
+/* Estilos da tabela de Relatório Detalhado */
+.relatorio-container {
+    max-height: 400px; 
+    overflow-y: auto;
+}
+.relatorio-item {
+    display: grid;
+    grid-template-columns: 1.5fr 1.5fr 1fr 0.8fr 0.8fr;
+    gap: 10px;
+    padding: 12px;
+    border-bottom: 1px solid #444;
+    font-size: 0.85rem;
+    align-items: center;
+}
+.relatorio-item.header {
+    font-weight: 600;
+    color: var(--text);
+    background: #3a3a3a;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+.relatorio-item:last-child {
+    border-bottom: none;
+}
+.relatorio-item .tipo-corte_gratis {
+    color: var(--success);
+    font-weight: 600;
+}
+.relatorio-item .tipo-corte_pago {
     color: var(--text-secondary);
 }
-.btn-logout {
-    min-width: 80px;
-    width: auto;
-    flex-shrink: 0; /* Não encolhe */
+
+/* Responsividade da tabela de relatório */
+@media (max-width: 768px) {
+    .relatorio-item {
+        grid-template-columns: 1fr 1fr; /* 2 colunas */
+        font-size: 0.8rem;
+    }
+    /* Esconde colunas menos importantes no mobile */
+    .relatorio-item span:nth-child(3), /* Barbeiro */
+    .relatorio-item span:nth-child(5) { /* Pontos */
+        display: none;
+    }
+    .relatorio-item.header span:nth-child(3),
+    .relatorio-item.header span:nth-child(5) {
+        display: none;
+    }
 }

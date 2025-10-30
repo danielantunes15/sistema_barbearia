@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/dashboard.css">
 </head>
@@ -23,11 +25,10 @@
             <div class="filters" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end;">
                 <div style="flex: 1; min-width: 120px;">
                     <label for="periodo" style="display: block; font-size: 0.85rem; color: var(--text-secondary);">Período</label>
-                    <select id="periodo" style="width: 100%; padding: 10px; border-radius: 8px; background: var(--input-bg); color: var(--text);">
+                    <select id="periodo" class="input-group" style="padding: 10px; height: 46px;">
                         <option value="hoje">Hoje</option>
                         <option value="semana">Esta Semana</option>
                         <option value="mes" selected>Este Mês</option>
-                        <option value="trimestre">Este Trimestre</option>
                         <option value="ano">Este Ano</option>
                         <option value="customizado">Customizado</option>
                     </select>
@@ -35,20 +36,21 @@
                 
                 <div style="flex: 1; min-width: 150px;">
                     <label for="dataInicio" style="display: block; font-size: 0.85rem; color: var(--text-secondary);">Data Início</label>
-                    <input type="date" id="dataInicio" disabled style="width: 100%; padding: 10px; border-radius: 8px; background: var(--input-bg); color: var(--text);">
+                    <input type="date" id="dataInicio" disabled class="input-group" style="padding: 10px; height: 46px;">
                 </div>
                 
                 <div style="flex: 1; min-width: 150px;">
                     <label for="dataFim" style="display: block; font-size: 0.85rem; color: var(--text-secondary);">Data Fim</label>
-                    <input type="date" id="dataFim" disabled style="width: 100%; padding: 10px; border-radius: 8px; background: var(--input-bg); color: var(--text);">
+                    <input type="date" id="dataFim" disabled class="input-group" style="padding: 10px; height: 46px;">
                 </div>
                 
-                <button id="aplicarFiltro" class="btn" style="width: auto; padding: 10px 15px; margin-top: 0;">Aplicar</button>
+                <button id="aplicarFiltro" class="btn" style="width: auto; min-height: 46px; margin-top: 0;">Aplicar</button>
             </div>
         </div>
-        <div class="stats-grid">
+        
+        <div class="stats-grid" id="relatorios-stats">
             <div class="stat-card">
-                <h4>Total Cortes no Período</h4>
+                <h4>Total Cortes (Período)</h4>
                 <div class="stat-number" id="totalCortesPeriodo">0</div>
             </div>
             <div class="stat-card">
@@ -61,29 +63,41 @@
             </div>
         </div>
 
-        <div class="stats-grid">
-            <div class="stat-card large" style="grid-column: span 1;"> <h4>Clientes Mais Frequentes (Top 5)</h4>
+        <div class="ranking-grid">
+            <div class="card">
+                <h3><i data-feather="trending-up"></i> Clientes Mais Frequentes (Top 5)</h3>
                 <div id="clientesFrequentes" class="ranking-list">
                     </div>
             </div>
             
-            <div class="stat-card large" style="grid-column: span 1;"> <h4>Horários Mais Movimentados (Top 5)</h4>
-                <div id="horariosMovimento" class="horarios-list">
+            <div class="card">
+                <h3><i data-feather="trending-down"></i> Clientes Ausentes (Top 5)</h3>
+                <div id="clientesAusentes" class="ranking-list">
+                    </div>
+            </div>
+            
+            <div class="card">
+                <h3><i data-feather="clock"></i> Horários de Pico (Top 5)</h3>
+                <div id="horariosMovimento" class="ranking-list">
                     </div>
             </div>
         </div>
         
         <div class="card">
-            <h3>Relatório de Cortes (Período Filtrado)</h3>
-            <div id="relatorioCortes" class="relatorio-container" style="max-height: 400px; overflow-y: auto;">
+            <h3><i data-feather="clipboard"></i> Relatório Detalhado de Cortes (Período)</h3>
+            <div id="relatorioCortes" class="relatorio-container">
                 </div>
         </div>
         
         <div class="card">
-            <h3>Exportar Dados (CSV)</h3>
+            <h3><i data-feather="download"></i> Exportar Dados (CSV)</h3>
             <div class="actions">
-                <button id="exportClientes" class="btn">Exportar Lista de Clientes</button>
-                <button id="exportCortes" class="btn btn-secondary">Exportar Histórico de Cortes</button>
+                <button id="exportClientes" class="btn btn-secondary">
+                    <i data-feather="users"></i> Exportar Lista de Clientes
+                </button>
+                <button id="exportCortes" class="btn btn-secondary">
+                    <i data-feather="scissors"></i> Exportar Histórico de Cortes
+                </button>
             </div>
         </div>
     </div>
@@ -99,5 +113,9 @@
     <script src="js/pages/relatorios.js"></script>
     
     <script src="js/main.js"></script>
+
+    <script>
+      feather.replace()
+    </script>
 </body>
 </html>
