@@ -798,21 +798,23 @@ if (document.getElementById('reader')) {
         // Dados do usuário para atualização
         const userToUpdate = JSON.parse(JSON.stringify(scannedUser)); 
         
+        // LÓGICA DE PONTUAÇÃO (CORRETA)
         if (tipoCorte === 'corte_pago') {
             userToUpdate.pontos = (userToUpdate.pontos || 0) + 1;
             
-            // Se atingir 10 pontos, acumula um corte grátis e reseta os pontos
+            // Se atingir 10 pontos (chegou no 10º corte)
             if (userToUpdate.pontos >= 10) {
+                // Adiciona o corte grátis (será 1)
                 userToUpdate.cortesGratis = (userToUpdate.cortesGratis || 0) + Math.floor(userToUpdate.pontos / 10);
+                // Reseta os pontos para o resto da divisão (10 % 10 = 0)
                 userToUpdate.pontos = userToUpdate.pontos % 10;
             }
             
         } else if (tipoCorte === 'corte_gratis') {
+            // Lógica de resgate (funciona para 10 pontos ou cortesGratis acumulados)
             if (userToUpdate.pontos >= 10) {
-                // Se o resgate for feito com 10 pontos exatos
                 userToUpdate.pontos = 0;
             } else if (userToUpdate.cortesGratis > 0) {
-                // Se o resgate for feito com cortes grátis acumulados
                 userToUpdate.cortesGratis = userToUpdate.cortesGratis - 1;
             } else {
                  alert('Erro: Cliente não tem cortes grátis para resgatar.');
@@ -820,9 +822,11 @@ if (document.getElementById('reader')) {
             }
         }
         
+        // 1. Tenta criar o registro de corte
         const corteSuccess = await createCorte(newCorte);
         
         if (corteSuccess) {
+            // 2. Tenta atualizar os pontos do usuário
             const userSuccess = await updateUser(userToUpdate);
 
             if (userSuccess) {
@@ -841,11 +845,13 @@ if (document.getElementById('reader')) {
                     ${userToUpdate.pontos === 0 && tipoCorte === 'corte_pago' ? '<p class="success">🎉 Cliente ganhou um corte grátis e começou novo ciclo!</p>' : ''}
                 `;
             } else {
-                 resultContainer.innerHTML = '<p>❌ Corte registrado, mas houve erro ao atualizar pontos do cliente. Atualize manualmente.</p>';
+                 // Esta mensagem indica a falha na atualização de pontos (updateUser falhou)
+                 resultContainer.innerHTML = '<p>❌ Erro ao atualizar pontos/fidelidade do cliente. Verifique as permissões de UPDATE no Supabase (RLS)!</p>';
                  resultContainer.className = 'result-container error';
             }
         } else {
-            resultContainer.innerHTML = '<p>❌ Erro ao salvar o corte no banco de dados!</p>';
+            // Esta mensagem indica a falha no registro do corte (createCorte falhou)
+            resultContainer.innerHTML = '<p>❌ Erro ao salvar o corte no banco de dados! Verifique se a tabela CORTES existe.</p>';
             resultContainer.className = 'result-container error';
         }
         
