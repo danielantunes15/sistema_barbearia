@@ -709,57 +709,68 @@ if (document.getElementById('reader')) {
     });
     
     async function onScanSuccess(decodedText, decodedResult) {
-        // Para o scanner após o primeiro sucesso
-        if (html5QrcodeScanner) {
-            html5QrcodeScanner.stop().catch(err => console.error(err));
-        }
-        
-        // 1. Buscar usuário no Supabase
-        const user = await getUserById(decodedText);
         const resultContainer = document.getElementById('result');
-        const corteTypeGroup = document.getElementById('corteTypeGroup');
-        const tipoCorteSelect = document.getElementById('tipoCorte');
         
-        if (user) {
-            scannedUser = user;
-            
-            const cpfFormatado = user.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-            const barbeiroNome = JSON.parse(localStorage.getItem('currentBarbeiro') || '{}').nome || 'N/A';
-            
-            // 2. Configurar UI
-            document.getElementById('stopScanner').style.display = 'none';
-            document.getElementById('startScanner').style.display = 'inline-block';
-            corteTypeGroup.style.display = 'block';
-            document.getElementById('confirmCorte').style.display = 'inline-block';
-            resultContainer.style.display = 'block';
-            resultContainer.className = 'result-container success'; // Muda temporariamente para sucesso/informação
-            
-            // Habilita/Desabilita Corte Grátis
-            const optionGratis = tipoCorteSelect.querySelector('option[value="corte_gratis"]');
-            
-            if (user.pontos >= 10 || (user.cortesGratis > 0 && user.pontos < 10)) {
-                optionGratis.textContent = `Corte Grátis (Acumulado: ${user.cortesGratis + (user.pontos >= 10 ? 1 : 0)})`;
-                optionGratis.disabled = false;
-            } else {
-                optionGratis.textContent = 'Corte Grátis (Pontos Insuficientes)';
-                optionGratis.disabled = true;
-                tipoCorteSelect.value = 'corte_pago';
+        // NOVO: Bloco try/catch para capturar falhas na busca/UI
+        try {
+             // Para o scanner após o primeiro sucesso
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.stop().catch(err => console.error(err));
             }
+
+            // 1. Buscar usuário no Supabase
+            const user = await getUserById(decodedText);
+            const corteTypeGroup = document.getElementById('corteTypeGroup');
+            const tipoCorteSelect = document.getElementById('tipoCorte');
             
-            resultContainer.innerHTML = `
-                <h3>Cliente Escaneado: ${user.nome}</h3>
-                <p><strong>CPF:</strong> ${cpfFormatado}</p>
-                <p><strong>Pontos:</strong> ${user.pontos}/10</p>
-                ${user.cortesGratis > 0 || user.pontos >= 10 ? 
-                    `<p class="success" style="font-weight: bold;">🎉 Cliente tem direito a ${user.cortesGratis + (user.pontos >= 10 ? 1 : 0)} corte(s) grátis.</p>` : ''}
-            `;
-            
-        } else {
-            resultContainer.innerHTML = '<p>❌ QR Code inválido! Tente novamente.</p>';
+            if (user) {
+                scannedUser = user;
+                
+                const cpfFormatado = user.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+                
+                // 2. Configurar UI
+                document.getElementById('stopScanner').style.display = 'none';
+                document.getElementById('startScanner').style.display = 'inline-block';
+                corteTypeGroup.style.display = 'block';
+                document.getElementById('confirmCorte').style.display = 'inline-block';
+                resultContainer.style.display = 'block';
+                resultContainer.className = 'result-container success'; // Muda temporariamente para sucesso/informação
+                
+                // Habilita/Desabilita Corte Grátis
+                const optionGratis = tipoCorteSelect.querySelector('option[value="corte_gratis"]');
+                
+                if (user.pontos >= 10 || (user.cortesGratis > 0 && user.pontos < 10)) {
+                    optionGratis.textContent = `Corte Grátis (Acumulado: ${user.cortesGratis + (user.pontos >= 10 ? 1 : 0)})`;
+                    optionGratis.disabled = false;
+                } else {
+                    optionGratis.textContent = 'Corte Grátis (Pontos Insuficientes)';
+                    optionGratis.disabled = true;
+                    tipoCorteSelect.value = 'corte_pago';
+                }
+                
+                resultContainer.innerHTML = `
+                    <h3>Cliente Escaneado: ${user.nome}</h3>
+                    <p><strong>CPF:</strong> ${cpfFormatado}</p>
+                    <p><strong>Pontos:</strong> ${user.pontos}/10</p>
+                    ${user.cortesGratis > 0 || user.pontos >= 10 ? 
+                        `<p class="success" style="font-weight: bold;">🎉 Cliente tem direito a ${user.cortesGratis + (user.pontos >= 10 ? 1 : 0)} corte(s) grátis.</p>` : ''}
+                `;
+                
+            } else {
+                resultContainer.innerHTML = '<p>❌ QR Code inválido! Tente novamente.</p>';
+                resultContainer.className = 'result-container error';
+                resultContainer.style.display = 'block';
+                document.getElementById('confirmCorte').style.display = 'none';
+                corteTypeGroup.style.display = 'none';
+            }
+        } catch (error) {
+            console.error("ERRO CRÍTICO NO SCANNER:", error);
+            resultContainer.innerHTML = `<p>❌ Erro interno ao carregar cliente. Verifique o console. (${error.message})</p>`;
             resultContainer.className = 'result-container error';
             resultContainer.style.display = 'block';
             document.getElementById('confirmCorte').style.display = 'none';
-            corteTypeGroup.style.display = 'none';
+            document.getElementById('corteTypeGroup').style.display = 'none';
+            scannedUser = null;
         }
     }
     
