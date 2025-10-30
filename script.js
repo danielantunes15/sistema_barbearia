@@ -226,7 +226,7 @@ if (document.getElementById('cadastroForm')) {
 
         const userId = 'user_' + Date.now();
         
-        // NOVO: removido 'historico', adicionado 'cortesGratis'
+        // CORREÇÃO AQUI: cortesGratis -> cortes_gratis
         const newUser = {
             id: userId,
             nome: nome,
@@ -235,7 +235,7 @@ if (document.getElementById('cadastroForm')) {
             email: email,
             password: hashedPassword, // Salva o hash
             pontos: 0,
-            cortesGratis: 0,
+            cortes_gratis: 0, 
             dataCadastro: new Date().toISOString()
         };
         
@@ -291,10 +291,10 @@ if (document.getElementById('userName')) {
             
             document.getElementById('currentPoints').textContent = user.pontos;
             
-            // NOVO: Preenche estatísticas
+            // CORREÇÃO AQUI: cortesGratis -> cortes_gratis
             if (document.getElementById('totalCortesPagos')) {
                 document.getElementById('totalCortesPagos').textContent = totalCortesPagos;
-                document.getElementById('cortesGratisAcumulados').textContent = user.cortesGratis || 0;
+                document.getElementById('cortesGratisAcumulados').textContent = user.cortes_gratis || 0;
                 document.getElementById('cortesGratisUtilizados').textContent = cortesGratisUtilizados;
                 document.getElementById('frequencia').textContent = calcularFrequencia(cortesParaFrequencia);
             }
@@ -467,7 +467,7 @@ async function carregarDashboardBarbeiro(barbeiroId) {
             </div>
             <div class="cliente-stats">
                 <span class="pontos-badge ${badgeClass}">${cliente.pontos} pontos</span>
-                <p style="font-size: 0.8rem; margin-top: 5px;">${(cliente.cortesGratis || 0) + (cliente.pontos >= 10 ? 1 : 0)} cortes grátis</p>
+                <p style="font-size: 0.8rem; margin-top: 5px;">${(cliente.cortes_gratis || 0) + (cliente.pontos >= 10 ? 1 : 0)} cortes grátis</p>
             </div>
         `;
         containerTodos.appendChild(div);
@@ -736,10 +736,10 @@ if (document.getElementById('reader')) {
                 resultContainer.style.display = 'block';
                 resultContainer.className = 'result-container success'; // Muda temporariamente para sucesso/informação
                 
-                // Habilita/Desabilita Corte Grátis
-                const temCorteGratis = user.pontos >= 10 || user.cortesGratis > 0;
+                // CORREÇÃO AQUI: cortesGratis -> cortes_gratis
+                const temCorteGratis = user.pontos >= 10 || user.cortes_gratis > 0;
                 const optionGratis = tipoCorteSelect.querySelector('option[value="corte_gratis"]');
-                const totalGratis = (user.cortesGratis || 0) + (user.pontos >= 10 ? 1 : 0);
+                const totalGratis = (user.cortes_gratis || 0) + (user.pontos >= 10 ? 1 : 0);
 
                 if (temCorteGratis) {
                     optionGratis.textContent = `Corte Grátis (Acumulado: ${totalGratis})`;
@@ -804,13 +804,14 @@ if (document.getElementById('reader')) {
         const userToUpdate = JSON.parse(JSON.stringify(scannedUser)); 
         
         // LÓGICA DE PONTUAÇÃO (CORRETA)
+        // CORREÇÃO AQUI: cortesGratis -> cortes_gratis
         if (tipoCorte === 'corte_pago') {
             userToUpdate.pontos = (userToUpdate.pontos || 0) + 1;
             
             // Se atingir 10 pontos (chegou no 10º corte)
             if (userToUpdate.pontos >= 10) {
                 // Concede o corte grátis (será 1)
-                userToUpdate.cortesGratis = (userToUpdate.cortesGratis || 0) + Math.floor(userToUpdate.pontos / 10);
+                userToUpdate.cortes_gratis = (userToUpdate.cortes_gratis || 0) + Math.floor(userToUpdate.pontos / 10);
                 // Reseta os pontos para o resto da divisão (10 % 10 = 0)
                 userToUpdate.pontos = userToUpdate.pontos % 10;
             }
@@ -820,9 +821,9 @@ if (document.getElementById('reader')) {
             if (userToUpdate.pontos >= 10) {
                 // Se resgatar usando os 10 pontos atuais, zera os pontos.
                 userToUpdate.pontos = 0;
-            } else if (userToUpdate.cortesGratis > 0) {
+            } else if (userToUpdate.cortes_gratis > 0) {
                 // Se resgatar usando o estoque acumulado, decrementa o estoque.
-                userToUpdate.cortesGratis = userToUpdate.cortesGratis - 1;
+                userToUpdate.cortes_gratis = userToUpdate.cortes_gratis - 1;
             } else {
                  alert('Erro: Cliente não tem cortes grátis para resgatar.');
                  return;
@@ -843,11 +844,12 @@ if (document.getElementById('reader')) {
                 document.getElementById('confirmCorte').style.display = 'none';
                 document.getElementById('corteTypeGroup').style.display = 'none';
                 
+                // CORREÇÃO AQUI: cortesGratis -> cortes_gratis
                 resultContainer.innerHTML = `
                     <h3>✅ Corte (${tipoCorte === 'corte_pago' ? 'Pago' : 'Grátis'}) registrado!</h3>
                     <p><strong>Cliente:</strong> ${scannedUser.nome}</p>
                     <p><strong>Novo Saldo de Pontos:</strong> ${userToUpdate.pontos}/10</p>
-                    <p><strong>Cortes Grátis Acumulados:</strong> ${userToUpdate.cortesGratis}</p>
+                    <p><strong>Cortes Grátis Acumulados:</strong> ${userToUpdate.cortes_gratis}</p>
                     <p><strong>Data:</strong> ${now.toLocaleDateString('pt-BR')} ${now.toLocaleTimeString('pt-BR')}</p>
                     ${tipoCorte === 'corte_gratis' ? '<p class="success">🎉 Corte grátis resgatado! Novo ciclo iniciado ou estoque atualizado.</p>' : ''}
                     ${userToUpdate.pontos === 0 && tipoCorte === 'corte_pago' ? '<p class="success">🎉 Cliente ganhou um corte grátis e começou novo ciclo!</p>' : ''}
@@ -1079,13 +1081,14 @@ if (document.getElementById('exportClientes')) {
 // ATUALIZADO: exportarClientes (remove historico)
 async function exportarClientes() {
     const users = await getAllUsers();
+    // CORREÇÃO AQUI: cortesGratis -> cortes_gratis
     const csv = ['Nome,CPF,E-mail,Data Nascimento,Pontos,Cortes Grátis Acumulados,Data Cadastro'];
     
     users.forEach(user => {
         const cpfFormatado = user.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
         const dataNascimento = user.dataNascimento ? new Date(user.dataNascimento).toLocaleDateString('pt-BR') : 'N/A';
         const dataCadastro = user.dataCadastro ? new Date(user.dataCadastro).toLocaleDateString('pt-BR') : 'N/A';
-        csv.push(`"${user.nome}","'${cpfFormatado}","${user.email}","${dataNascimento}",${user.pontos},${user.cortesGratis || 0},"${dataCadastro}"`);
+        csv.push(`"${user.nome}","'${cpfFormatado}","${user.email}","${dataNascimento}",${user.pontos},${user.cortes_gratis || 0},"${dataCadastro}"`);
     });
     
     downloadCSV(csv.join('\n'), 'clientes_barbearia_style.csv');
@@ -1288,10 +1291,11 @@ if (document.getElementById('managementPage')) {
             }
             
             const hashedPassword = hashPassword(password);
+            // CORREÇÃO AQUI: cortesGratis -> cortes_gratis
             const newUser = {
                 id: 'user_' + Date.now(),
                 nome, cpf, email, dataNascimento, password: hashedPassword,
-                pontos: 0, cortesGratis: 0, dataCadastro: new Date().toISOString() // ATUALIZADO
+                pontos: 0, cortes_gratis: 0, dataCadastro: new Date().toISOString() // ATUALIZADO
             };
             
             const created = await createNewUser(newUser);
@@ -1374,11 +1378,12 @@ async function loadManagementLists() {
     users.forEach(user => {
         const item = document.createElement('div');
         item.className = 'list-item';
+        // CORREÇÃO AQUI: cortesGratis -> cortes_gratis
         item.innerHTML = `
             <div class="list-item-info">
                 <h4>${user.nome}</h4>
                 <p>CPF: ${user.cpf} | Email: ${user.email}</p>
-                <p>Pontos: ${user.pontos} | Cortes Grátis: ${user.cortesGratis || 0} | Total Cortes: ${cortesPorCliente[user.id] || 0}</p>
+                <p>Pontos: ${user.pontos} | Cortes Grátis: ${user.cortes_gratis || 0} | Total Cortes: ${cortesPorCliente[user.id] || 0}</p>
             </div>
             <button class="btn-delete" data-id="${user.id}" data-tipo="user">Excluir</button>
         `;

@@ -301,8 +301,8 @@ async function getCortesByUserId(userId) {
 async function getAllCortes() {
     const { data, error } = await supabaseClient
         .from('cortes')
-        // Adicionada a busca por 'cortes.users.pontos' para relatórios
-        .select('*, users(nome, cpf, email, pontos, cortesGratis), barbeiros(nome)');
+        // CORREÇÃO AQUI: cortesGratis -> cortes_gratis
+        .select('*, users(nome, cpf, email, pontos, cortes_gratis), barbeiros(nome)');
         
     if (error) {
         console.error('Erro ao buscar todos os cortes:', error);
