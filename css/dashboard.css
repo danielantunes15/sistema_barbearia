@@ -138,16 +138,11 @@ body#dashboard-cliente {
     padding: 8px 4px;
 }
 
-/* Botão principal de "Escanear" */
-.app-nav .app-nav-item.btn-primary {
-    background: var(--accent);
-    color: var(--primary);
-    border-radius: 12px;
-    font-weight: 600;
-}
-.app-nav .app-nav-item.btn-primary:hover {
-    background: var(--accent-hover);
-}
+/* ****** REMOVIDO ****** */
+/* Não há mais estilo especial para btn-primary no mobile */
+/*
+.app-nav .app-nav-item.btn-primary { ... }
+*/
 
 .app-nav .app-nav-item:hover {
     background: transparent;
@@ -193,6 +188,7 @@ body#dashboard-cliente {
     }
     
     /* Restaura botões secundários */
+    /* Agora todos os botões no .app-nav terão esse estilo no desktop */
     .app-nav .app-nav-item.btn-secondary {
          background: transparent;
          color: var(--text);
@@ -203,14 +199,11 @@ body#dashboard-cliente {
          border-color: #777;
     }
 
-    /* Restaura o botão de Gerenciar (cor customizada) */
-    .app-nav a[href="gerenciar-usuarios.html"] {
-        background-color: #555;
-        border-color: #555;
-    }
-    .app-nav a[href="gerenciar-usuarios.html"]:hover {
-        background-color: #666;
-    }
+    /* ****** REMOVIDO ****** */
+    /* Não há mais estilo especial para gerenciar-usuarios */
+    /*
+    .app-nav a[href="gerenciar-usuarios.html"] { ... }
+    */
 }
 
 
