@@ -123,3 +123,21 @@ async function getAgendamentosByBarbeiro(barbeiroId) {
     if (error) console.error('Erro ao buscar agendamentos:', error);
     return data || [];
 }
+
+/**
+ * NOVO: Atualiza o status de um agendamento (ex: 'concluido' ou 'cancelado')
+ */
+async function updateAgendamentoStatus(agendamentoId, novoStatus) {
+    const { data, error } = await supabaseClient
+        .from('agendamentos')
+        .update({ status: novoStatus })
+        .eq('id', agendamentoId)
+        .select()
+        .single();
+        
+    if (error) {
+        console.error('Erro ao atualizar status do agendamento:', error);
+        return null;
+    }
+    return data;
+}
