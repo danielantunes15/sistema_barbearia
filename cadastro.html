@@ -33,12 +33,12 @@
             
             <div class="input-group">
                 <div class="input-icon">🔢</div>
-                <input type="text" id="cpf" placeholder="CPF (somente números)" required maxlength="14" oninput="formatarCPF(this)">
+                <input type="text" id="cpf" placeholder="CPF (somente números)" required maxlength="14" oninput="formatarCPF(this); checkFieldAvailability(this, 'cpf')" data-live-check>
             </div>
             
             <div class="input-group">
                 <div class="input-icon">📧</div>
-                <input type="email" id="email" placeholder="Seu melhor e-mail" required>
+                <input type="email" id="email" placeholder="Seu melhor e-mail" required oninput="checkFieldAvailability(this, 'email')" data-live-check>
             </div>
             
             <div class="input-group">

@@ -13,21 +13,48 @@
             <a href="dashboard-barbeiro.html" class="btn-secondary">Voltar</a>
         </div>
         
-        <div class="card" style="display: none;"> <h3>Filtros</h3>
-            <div class="filters">
-                <select id="periodo">
-                    <option value="hoje">Hoje</option>
-                    <option value="semana">Esta Semana</option>
-                    <option value="mes" selected>Este Mês</option>
-                    <option value="trimestre">Este Trimestre</option>
-                    <option value="ano">Este Ano</option>
-                </select>
-                <input type="date" id="dataInicio">
-                <input type="date" id="dataFim">
-                <button id="aplicarFiltro" class="btn">Aplicar</button>
+        <div class="card" id="filterCard"> <h3>Filtros</h3>
+            <div class="filters" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end;">
+                <div style="flex: 1; min-width: 120px;">
+                    <label for="periodo" style="display: block; font-size: 0.85rem; color: var(--text-secondary);">Período</label>
+                    <select id="periodo" style="width: 100%; padding: 10px; border-radius: 8px; background: var(--input-bg); color: var(--text);">
+                        <option value="hoje">Hoje</option>
+                        <option value="semana">Esta Semana</option>
+                        <option value="mes" selected>Este Mês</option>
+                        <option value="trimestre">Este Trimestre</option>
+                        <option value="ano">Este Ano</option>
+                        <option value="customizado">Customizado</option>
+                    </select>
+                </div>
+                
+                <div style="flex: 1; min-width: 150px;">
+                    <label for="dataInicio" style="display: block; font-size: 0.85rem; color: var(--text-secondary);">Data Início</label>
+                    <input type="date" id="dataInicio" disabled style="width: 100%; padding: 10px; border-radius: 8px; background: var(--input-bg); color: var(--text);">
+                </div>
+                
+                <div style="flex: 1; min-width: 150px;">
+                    <label for="dataFim" style="display: block; font-size: 0.85rem; color: var(--text-secondary);">Data Fim</label>
+                    <input type="date" id="dataFim" disabled style="width: 100%; padding: 10px; border-radius: 8px; background: var(--input-bg); color: var(--text);">
+                </div>
+                
+                <button id="aplicarFiltro" class="btn" style="width: auto; padding: 10px 15px; margin-top: 0;">Aplicar</button>
             </div>
         </div>
-        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h4>Total Cortes no Período</h4>
+                <div class="stat-number" id="totalCortesPeriodo">0</div>
+            </div>
+            <div class="stat-card">
+                <h4>Cortes Pagos</h4>
+                <div class="stat-number" id="cortesPagosPeriodo">0</div>
+            </div>
+            <div class="stat-card">
+                <h4>Cortes Grátis</h4>
+                <div class="stat-number" id="cortesGratisPeriodo">0</div>
+            </div>
+        </div>
+
         <div class="stats-grid">
             <div class="stat-card large">
                 <h4>Clientes Mais Frequentes (Top 5)</h4>
@@ -43,7 +70,7 @@
         </div>
         
         <div class="card">
-            <h3>Relatório de Clientes (Todos)</h3>
+            <h3>Relatório de Cortes (Período Filtrado)</h3>
             <div id="relatorioCortes" class="relatorio-container">
                 </div>
         </div>
