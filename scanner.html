@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Barbearia - Scanner</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/dashboard.css">
 </head>
-<body>
+<body id="scanner-page">
     <div class="container">
         <div class="header">
             <h1>Scanner</h1>
@@ -16,7 +17,7 @@
         <div class="card">
             <p>Posicione o QR Code do cliente dentro da área de leitura</p>
             
-            <div id="reader" class="scanner-container">
+            <div id="reader" class="scanner-container" style="width: 100%; height: 300px; background: #3a3a3a; border-radius: 15px;">
                 </div>
                 
             <div class="input-group" id="corteTypeGroup" style="display: none; margin-top: 20px;">
@@ -41,8 +42,14 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
-    <script src="supabase_config.js"></script>
-    <script src="db.js"></script>
-    <script src="script.js"></script>
+    
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    
+    <script src="js/pages/scanner.js"></script>
+    
+    <script src="js/main.js"></script>
 </body>
 </html>

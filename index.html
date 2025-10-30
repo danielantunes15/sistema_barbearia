@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Barbearia Style - Login</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/login.css">
 </head>
-<body class="login-page">
+<body id="login-page" class="login-page">
     <div class="login-container">
         <div class="login-header">
             <div class="logo-container">
@@ -35,7 +36,7 @@
                 
                 <div class="input-group">
                     <div class="input-icon">🔢</div>
-                    <input type="text" id="cpfCliente" placeholder="Seu CPF" required maxlength="14" oninput="formatarCPF(this)">
+                    <input type="text" id="cpfCliente" placeholder="Seu CPF" required maxlength="14">
                 </div>
                 
                 <div class="input-group">
@@ -58,7 +59,7 @@
                 
                 <div class="input-group">
                     <div class="input-icon">🔢</div>
-                    <input type="text" id="cpfBarbeiro" placeholder="Seu CPF" required maxlength="14" oninput="formatarCPF(this)">
+                    <input type="text" id="cpfBarbeiro" placeholder="Seu CPF" required maxlength="14">
                 </div>
                 
                 <div class="input-group">
@@ -91,8 +92,14 @@
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
-    <script src="supabase_config.js"></script>
-    <script src="db.js"></script>
-    <script src="script.js"></script>
+    
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    
+    <script src="js/pages/login.js"></script>
+    
+    <script src="js/main.js"></script>
 </body>
 </html>

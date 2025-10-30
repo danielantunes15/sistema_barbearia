@@ -1,0 +1,108 @@
+/* Estilos de: style.css */
+.user-info {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #444;
+}
+.user-info h2 {
+    color: var(--text);
+    margin-bottom: 10px;
+    font-size: 1.4rem;
+}
+
+/* Points Container */
+.points-container {
+    text-align: center;
+}
+.points-display {
+    font-size: 3rem;
+    font-weight: bold;
+    color: var(--accent);
+    margin-bottom: 10px;
+}
+.progress-bar {
+    height: 12px;
+    background: var(--input-bg);
+    border-radius: 10px;
+    margin: 20px 0;
+    overflow: hidden;
+}
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(45deg, var(--accent), #f1c40f);
+    border-radius: 10px;
+    width: 0%;
+    transition: width 0.5s ease;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+.stat-card {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    border: 1px solid #444;
+}
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--accent);
+}
+
+/* History List */
+.history-list {
+    list-style-type: none;
+}
+.history-list li {
+    padding: 15px 0;
+    border-bottom: 1px solid #444;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Clientes Lista */
+.clientes-lista {
+    max-height: 400px;
+    overflow-y: auto;
+}
+.cliente-item {
+    padding: 18px;
+    border-bottom: 1px solid #444;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.3s ease;
+}
+.cliente-info h4 { margin-bottom: 8px; }
+.pontos-badge {
+    background: var(--accent);
+    color: var(--primary);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+.pontos-badge.alto { background: var(--success); color: white; }
+.pontos-badge.medio { background: var(--warning); color: var(--primary); }
+
+/* Search Bar */
+.search-bar {
+    margin-bottom: 20px;
+}
+.search-bar input {
+    width: 100%;
+    padding: 12px 20px;
+    background: var(--input-bg);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    color: var(--text);
+}

@@ -4,53 +4,34 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Barbearia - Meu QR Code</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/dashboard.css">
 
   <style>
     body {
-      background-color: var(--bg-primary, #111);
-      color: var(--text-primary, #fff);
-      font-family: "Poppins", sans-serif;
+      background-color: var(--primary); /* Atualizado para usar variável */
+      color: var(--text); /* Atualizado para usar variável */
     }
-
     .container {
       max-width: 500px;
       margin: 50px auto;
-      background: #1e1e1e;
+      background: var(--secondary); /* Atualizado para usar variável */
       padding: 20px;
       border-radius: 15px;
       box-shadow: 0 0 15px rgba(0,0,0,0.3);
     }
-
     .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      border-bottom: none; /* Remove a borda dupla */
       margin-bottom: 20px;
     }
-
     .btn-secondary {
       background: #444;
       color: #fff;
-      border: none;
-      padding: 8px 15px;
-      border-radius: 8px;
-      cursor: pointer;
-      text-decoration: none;
-      font-weight: bold;
     }
-
-    .btn-secondary:hover {
-      background: #666;
-    }
-
     .card {
-      background: #2a2a2a;
-      padding: 20px;
-      border-radius: 12px;
+      background: var(--card-bg); /* Atualizado para usar variável */
       text-align: center;
     }
-
     .qrcode-container {
       margin: 20px auto;
       display: flex;
@@ -61,19 +42,19 @@
       width: fit-content;
       padding: 10px;
     }
-
     .user-id {
       margin-top: 10px;
       font-size: 1.1rem;
-      color: #ccc;
+      color: var(--text-secondary); /* Atualizado para usar variável */
     }
-
     .instructions {
       margin-top: 25px;
+      color: var(--text-secondary); 
+      padding: 15px;
     }
   </style>
 </head>
-<body>
+<body id="qrcode-page">
   <div class="container">
     <div class="header">
       <h1>Meu QR Code</h1>
@@ -90,7 +71,7 @@
       <p class="user-id">ID do usuário: <span id="userId">Carregando...</span></p>
     </div>
     
-    <div class="instructions" style="color: var(--text-secondary); padding: 15px;">
+    <div class="instructions">
       <h3>Como funciona:</h3>
       <ol>
         <li>Apresente este QR Code ao barbeiro</li>
@@ -102,32 +83,20 @@
   </div>
 
   <script>
-    // Testa e tenta recarregar o script caso falhe
     (function loadQRCodeLib() {
       const script = document.createElement('script');
       script.src = "https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js";
       
-      // CHAMA A FUNÇÃO DE GERAÇÃO APENAS QUANDO A BIBLIOTECA É CARREGADA
       script.onload = () => {
           console.log("✅ Biblioteca QRCode carregada com sucesso.");
-          if (typeof initializeQRCode !== 'undefined') {
-              initializeQRCode();
-          }
+          // O main.js agora cuidará de chamar initQRCodePage()
       };
       
       script.onerror = () => {
         console.error("❌ Falha ao carregar QRCode.js. Tentando fallback...");
-        // Tenta um segundo CDN
         const fallback = document.createElement('script');
         fallback.src = "https://unpkg.com/qrcode/build/qrcode.min.js";
-        
-        fallback.onload = () => {
-             console.log("✅ QRCode carregado pelo fallback.");
-             if (typeof initializeQRCode !== 'undefined') {
-                  initializeQRCode();
-             }
-        };
-        
+        fallback.onload = () => console.log("✅ QRCode carregado pelo fallback.");
         fallback.onerror = () => console.error("❌ Falha total ao carregar QRCode.js!");
         document.head.appendChild(fallback);
       };
@@ -137,12 +106,14 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
-  <script src="supabase_config.js"></script>
-  <script src="db.js"></script>
-  <script src="script.js"></script>
-
-  <script>
-    // Bloco vazio para garantir que o script.js tenha sido carregado antes das dependências.
-  </script>
+    
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  
+  <script src="js/pages/qrcode.js"></script>
+  
+  <script src="js/main.js"></script>
 </body>
 </html>

@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Barbearia - Relatórios</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/dashboard.css">
 </head>
-<body>
+<body id="relatorios-page">
     <div class="container">
         <div class="header">
             <h1>Relatórios</h1>
@@ -56,14 +57,12 @@
         </div>
 
         <div class="stats-grid">
-            <div class="stat-card large">
-                <h4>Clientes Mais Frequentes (Top 5)</h4>
+            <div class="stat-card large" style="grid-column: span 1;"> <h4>Clientes Mais Frequentes (Top 5)</h4>
                 <div id="clientesFrequentes" class="ranking-list">
                     </div>
             </div>
             
-            <div class="stat-card large">
-                <h4>Horários Mais Movimentados (Top 5)</h4>
+            <div class="stat-card large" style="grid-column: span 1;"> <h4>Horários Mais Movimentados (Top 5)</h4>
                 <div id="horariosMovimento" class="horarios-list">
                     </div>
             </div>
@@ -71,7 +70,7 @@
         
         <div class="card">
             <h3>Relatório de Cortes (Período Filtrado)</h3>
-            <div id="relatorioCortes" class="relatorio-container">
+            <div id="relatorioCortes" class="relatorio-container" style="max-height: 400px; overflow-y: auto;">
                 </div>
         </div>
         
@@ -86,8 +85,14 @@
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
-    <script src="supabase_config.js"></script>
-    <script src="db.js"></script>
-    <script src="script.js"></script>
+    
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    
+    <script src="js/pages/relatorios.js"></script>
+    
+    <script src="js/main.js"></script>
 </body>
 </html>

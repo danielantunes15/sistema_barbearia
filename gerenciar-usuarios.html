@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Barbearia - Gerenciar Usuários</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    
     <style>
         .management-list { max-height: 400px; overflow-y: auto; }
         .list-item {
@@ -28,14 +30,12 @@
         }
         .btn-delete:hover { background: #c0392b; }
         
-        /* ATUALIZADO: Formulário de cadastro com 2 colunas */
         .form-cadastro { 
             display: grid; 
             grid-template-columns: 1fr 1fr; 
             gap: 15px; 
         }
         .form-cadastro .btn {
-            /* Faz o botão ocupar as 2 colunas */
             grid-column: span 2;
         }
         
@@ -45,8 +45,8 @@
         }
     </style>
 </head>
-<body>
-    <div class="container" id="managementPage">
+<body id="gerenciamento-page">
+    <div class="container">
         <div class="header">
             <h1>Gerenciar Usuários</h1>
             <a href="dashboard-barbeiro.html" class="btn-secondary">Voltar</a>
@@ -62,7 +62,7 @@
                 <h3>Cadastrar Novo Cliente</h3>
                 <form id="adminCreateClienteForm" class="form-cadastro">
                     <div class="input-group"><input type="text" id="adminNomeCliente" placeholder="Nome completo" required></div>
-                    <div class="input-group"><input type="text" id="adminCpfCliente" placeholder="CPF" required oninput="formatarCPF(this)" maxlength="14"></div>
+                    <div class="input-group"><input type="text" id="adminCpfCliente" placeholder="CPF" required maxlength="14"></div>
                     <div class="input-group"><input type="email" id="adminEmailCliente" placeholder="E-mail" required></div>
                     <div class="input-group"><input type="date" id="adminNascCliente" placeholder="Data Nasc." required></div>
                     <div class="input-group"><input type="password" id="adminSenhaCliente" placeholder="Senha (mín. 6)" required minlength="6" style="grid-column: span 2;"></div>
@@ -81,7 +81,7 @@
                 <h3>Cadastrar Novo Barbeiro</h3>
                 <form id="adminCreateBarbeiroForm" class="form-cadastro">
                     <div class="input-group"><input type="text" id="adminNomeBarbeiro" placeholder="Nome completo" required></div>
-                    <div class="input-group"><input type="text" id="adminCpfBarbeiro" placeholder="CPF" required oninput="formatarCPF(this)" maxlength="14"></div>
+                    <div class="input-group"><input type="text" id="adminCpfBarbeiro" placeholder="CPF" required maxlength="14"></div>
                     <div class="input-group"><input type="email" id="adminEmailBarbeiro" placeholder="E-mail" required></div>
                     <div class="input-group"><input type="password" id="adminSenhaBarbeiro" placeholder="Senha (mín. 6)" required minlength="6"></div>
                     <button type="submit" class="btn btn-primary">Cadastrar Barbeiro</button>
@@ -98,8 +98,14 @@
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
-    <script src="supabase_config.js"></script>
-    <script src="db.js"></script>
-    <script src="script.js"></script>
+    
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    
+    <script src="js/pages/gerenciamento.js"></script>
+    
+    <script src="js/main.js"></script>
 </body>
 </html>
