@@ -124,45 +124,34 @@ function initScannerPage() {
         
         const userToUpdate = JSON.parse(JSON.stringify(scannedUser)); 
         
-        // ==========================================================
-        // AQUI ESTÁ A LÓGICA DE FIDELIDADE (script.js)
-        // ==========================================================
-        
         if (tipoCorte === 'corte_pago') {
-            // 1. Adiciona um ponto
             userToUpdate.pontos = (userToUpdate.pontos || 0) + 1;
             
-            // 2. Verifica se completou o ciclo (10 pontos ou mais)
             if (userToUpdate.pontos >= 10) {
-                // 3. Adiciona o(s) corte(s) grátis ganhos
                 userToUpdate.cortes_gratis = (userToUpdate.cortes_gratis || 0) + Math.floor(userToUpdate.pontos / 10);
-                // 4. REINICIA O CICLO: Os pontos viram o resto da divisão (ex: 10 % 10 = 0)
                 userToUpdate.pontos = userToUpdate.pontos % 10;
             }
             
         } else if (tipoCorte === 'corte_gratis') {
-            // Lógica de resgate
             if (userToUpdate.pontos >= 10) {
-                // Se está resgatando os 10 pontos atuais, zera os pontos.
                 userToUpdate.pontos = 0;
             } else if (userToUpdate.cortes_gratis > 0) {
-                // Se está resgatando do "estoque", decrementa o estoque.
                 userToUpdate.cortes_gratis = userToUpdate.cortes_gratis - 1;
             } else {
                  return alert('Erro: Cliente não tem cortes grátis para resgatar.');
             }
         }
         
-        // 1. Tenta criar o registro de corte
         const corteSuccess = await createCorte(newCorte);
         
         if (corteSuccess) {
-            // 2. Tenta atualizar os pontos do usuário
             const userSuccess = await updateUser(userToUpdate);
 
             if (userSuccess) {
-                // Atualiza o localStorage para o próximo checkAuth
-                localStorage.setItem('currentUser', JSON.stringify(userToUpdate)); 
+                
+                // ==========================================================
+                // LINHA CORRIGIDA - A LINHA PROBLEMÁTICA FOI REMOVIDA DAQUI
+                // ==========================================================
                 
                 confirmBtn.style.display = 'none';
                 corteTypeGroup.style.display = 'none';
