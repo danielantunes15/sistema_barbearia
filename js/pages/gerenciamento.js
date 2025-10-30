@@ -16,6 +16,8 @@ function initGerenciamentoPage() {
         const cpf = document.getElementById('adminCpfCliente').value.replace(/\D/g, '');
         const email = document.getElementById('adminEmailCliente').value;
         const dataNascimento = document.getElementById('adminNascCliente').value;
+        
+        // CORREÇÃO: O seletor agora busca o INPUT pelo ID (graças à correção no HTML)
         const password = document.getElementById('adminSenhaCliente').value;
         
         if (!nome || !cpf || !email || !dataNascimento || !password) {
@@ -140,12 +142,13 @@ async function loadManagementLists() {
         listaBarbeiros.appendChild(item);
     });
     
+    // CORREÇÃO: O seletor foi atualizado de '.btn-delete' para '.list-item .btn-danger'
     // Adicionar listeners aos botões de exclusão
-    document.querySelectorAll('.btn-delete').forEach(btn => {
+    document.querySelectorAll('.list-item .btn-danger').forEach(btn => {
         btn.addEventListener('click', async (e) => {
             const id = e.target.dataset.id;
             const tipo = e.target.dataset.tipo;
-            const nome = e.target.previousElementSibling.querySelector('h4').textContent;
+            const nome = e.target.closest('.list-item').querySelector('h4').textContent; // Seletor mais seguro
 
             if (confirm(`Tem certeza que deseja excluir "${nome}"? Esta ação removerá os cortes/agendamentos associados.`)) {
                 let success = false;

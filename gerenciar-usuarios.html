@@ -12,7 +12,44 @@
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/dashboard.css">
     
-    </head>
+    <style>
+        .management-list { max-height: 400px; overflow-y: auto; }
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #444;
+        }
+        .list-item-info { flex: 1; }
+        .list-item-info h4 { margin-bottom: 5px; }
+        .list-item-info p { font-size: 0.85rem; color: var(--text-secondary); }
+        
+        /* O estilo .btn-delete foi removido daqui, pois agora usa .btn-danger de base.css */
+        
+        /* ATUALIZADO: Mobile-First (Padrão) */
+        .form-cadastro { 
+            display: grid; 
+            grid-template-columns: 1fr; /* 1 coluna por padrão */
+            gap: 15px; 
+        }
+        
+        /* Em telas maiores, usamos 2 colunas */
+        @media (min-width: 768px) {
+            .form-cadastro { grid-template-columns: 1fr 1fr; }
+            
+            .form-cadastro .btn {
+                /* Faz o botão ocupar as 2 colunas */
+                grid-column: span 2;
+            }
+
+            /* Garante que o input de senha ocupe 2 colunas no desktop */
+            .form-cadastro-senha { /* Seletor corrigido */
+                 grid-column: span 2;
+            }
+        }
+    </style>
+</head>
 <body id="gerenciamento-page">
     <div class="container" id="managementPage">
         <div class="header">
@@ -33,7 +70,11 @@
                     <div class="input-group"><input type="text" id="adminCpfCliente" placeholder="CPF" required maxlength="14"></div>
                     <div class="input-group"><input type="email" id="adminEmailCliente" placeholder="E-mail" required></div>
                     <div class="input-group"><input type="date" id="adminNascCliente" placeholder="Data Nasc." required></div>
-                    <div class="input-group" id="adminSenhaCliente"><input type="password" placeholder="Senha (mín. 6)" required minlength="6"></div>
+                    
+                    <div class="input-group form-cadastro-senha">
+                        <input type="password" id="adminSenhaCliente" placeholder="Senha (mín. 6)" required minlength="6">
+                    </div>
+                    
                     <button type="submit" class="btn btn-primary">Cadastrar Cliente</button>
                 </form>
             </div>
