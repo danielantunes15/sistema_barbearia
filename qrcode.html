@@ -101,19 +101,33 @@
     </div>
   </div>
 
-  <!-- QRCode.js (CDN corrigido e garantido) -->
   <script>
     // Testa e tenta recarregar o script caso falhe
     (function loadQRCodeLib() {
       const script = document.createElement('script');
       script.src = "https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js";
-      script.onload = () => console.log("✅ Biblioteca QRCode carregada com sucesso.");
+      
+      // CHAMA A FUNÇÃO DE GERAÇÃO APENAS QUANDO A BIBLIOTECA É CARREGADA
+      script.onload = () => {
+          console.log("✅ Biblioteca QRCode carregada com sucesso.");
+          if (typeof initializeQRCode !== 'undefined') {
+              initializeQRCode();
+          }
+      };
+      
       script.onerror = () => {
         console.error("❌ Falha ao carregar QRCode.js. Tentando fallback...");
         // Tenta um segundo CDN
         const fallback = document.createElement('script');
         fallback.src = "https://unpkg.com/qrcode/build/qrcode.min.js";
-        fallback.onload = () => console.log("✅ QRCode carregado pelo fallback.");
+        
+        fallback.onload = () => {
+             console.log("✅ QRCode carregado pelo fallback.");
+             if (typeof initializeQRCode !== 'undefined') {
+                  initializeQRCode();
+             }
+        };
+        
         fallback.onerror = () => console.error("❌ Falha total ao carregar QRCode.js!");
         document.head.appendChild(fallback);
       };
@@ -121,7 +135,6 @@
     })();
   </script>
 
-  <!-- Dependências -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
   <script src="supabase_config.js"></script>
@@ -129,22 +142,7 @@
   <script src="script.js"></script>
 
   <script>
-    // Função adicional para verificar carregamento da lib
-    document.addEventListener("DOMContentLoaded", () => {
-      setTimeout(() => {
-        if (typeof QRCode === "undefined") {
-          console.warn("⚠️ QRCode.js ainda não carregado. O sistema tentará o modo de fallback.");
-          const container = document.getElementById("qrcode");
-          container.innerHTML = `
-            <div style="text-align: center; padding: 20px;">
-              <p>Falha ao carregar QR Code.</p>
-              <p>Mostre este ID ao barbeiro:</p>
-              <strong style="font-size: 1.2rem; color: var(--accent, #f39c12);">user_1</strong>
-            </div>
-          `;
-        }
-      }, 3000);
-    });
+    // Bloco vazio para garantir que o script.js tenha sido carregado antes das dependências.
   </script>
 </body>
 </html>

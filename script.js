@@ -467,7 +467,7 @@ async function carregarDashboardBarbeiro(barbeiroId) {
             </div>
             <div class="cliente-stats">
                 <span class="pontos-badge ${badgeClass}">${cliente.pontos} pontos</span>
-                <p style="font-size: 0.8rem; margin-top: 5px;">${totalCortesPagos} cortes pagos</p>
+                <p style="font-size: 0.8rem; margin-top: 5px;">${(cliente.cortesGratis || 0) + (cliente.pontos >= 10 ? 1 : 0)} cortes grátis</p>
             </div>
         `;
         containerTodos.appendChild(div);
@@ -595,9 +595,72 @@ function showFallbackQRCode(userId, container) {
     container.style.height = 'auto';
 }
 
-// QR Code - SOLUÇÃO DEFINITIVA
+// QR Code - SOLUÇÃO DEFINITIVA (Função mantida)
 function initializeQRCode() {
-    // ... (lógica de initializeQRCode mantida)
+    const qrcodeContainer = document.getElementById('qrcode');
+    if (!qrcodeContainer) return;
+
+    // Verifica se estamos na página de QR Code
+    if (!window.location.href.includes('qrcode.html')) return;
+
+    // Função para gerar QR Code
+    async function generateQRCode() {
+        const auth = await checkAuth();
+        
+        if (auth && auth.tipo === 'cliente') {
+            const user = auth.data;
+            document.getElementById('userId').textContent = user.id;
+            
+            // Verifica se a biblioteca QRCode está disponível
+            if (typeof QRCode === 'undefined') {
+                console.warn('QRCode library not available, showing fallback');
+                showFallbackQRCode(user.id, qrcodeContainer);
+                return;
+            }
+            
+            try {
+                // Limpa o container
+                qrcodeContainer.innerHTML = '';
+                
+                // Cria um canvas para o QR Code
+                const canvas = document.createElement('canvas');
+                qrcodeContainer.appendChild(canvas);
+                
+                // Gera o QR Code usando a biblioteca
+                QRCode.toCanvas(canvas, user.id, {
+                    width: 250,
+                    margin: 2,
+                    color: {
+                        dark: '#000000',
+                        light: '#FFFFFF'
+                    }
+                }, function(error) {
+                    if (error) {
+                        console.error('Erro ao gerar QR Code:', error);
+                        showFallbackQRCode(user.id, qrcodeContainer);
+                        return;
+                    }
+                    
+                    // Aplica estilos ao canvas
+                    canvas.style.border = '2px solid #444';
+                    canvas.style.borderRadius = '15px';
+                    canvas.style.padding = '15px';
+                    canvas.style.background = 'white';
+                    canvas.style.maxWidth = '100%';
+                });
+                
+            } catch (error) {
+                console.error('Erro geral ao gerar QR Code:', error);
+                showFallbackQRCode(user.id, qrcodeContainer);
+            }
+        } else {
+            // Se não for cliente ou não autenticado, redireciona
+            window.location.href = 'index.html';
+        }
+    }
+
+    // Tenta gerar o QR Code imediatamente
+    generateQRCode();
 }
 
 // Scanner (Async onScanSuccess)
@@ -1366,8 +1429,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Inicializa o QR Code após o DOM estar completamente carregado
-    initializeQRCode();
+    // Removido initializeQRCode() daqui
     
     console.log('Sistema de Barbearia (Supabase) inicializado.');
 });
