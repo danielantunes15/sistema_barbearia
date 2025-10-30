@@ -1,9 +1,12 @@
-/* Estilos de: style.css */
+/* =================================== */
+/* ARQUIVO: css/base.css (ATUALIZADO)   */
+/* =================================== */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* 1. NOVA FONTE MODERNA */
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 :root {
@@ -18,6 +21,11 @@
     --success: #27ae60;
     --warning: #f39c12;
     --danger: #e74c3c;
+    
+    /* 2. ESPAÇAMENTO CONSISTENTE */
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
 }
 
 body {
@@ -25,15 +33,27 @@ body {
     color: var(--text);
     line-height: 1.6;
     min-height: 100vh;
+    /* 3. MELHOR RENDERIZAÇÃO DE FONTE */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-/* Container Geral */
+/* Container Geral (Mobile-First) */
 .container {
-    max-width: 100%;
-    padding: 20px;
+    width: 100%;
+    /* 4. Padding padrão para mobile */
+    padding: var(--spacing-md); 
     margin: 0 auto;
     background: var(--primary);
     min-height: 100vh;
+}
+
+/* Em telas maiores, limitamos a largura */
+@media (min-width: 768px) {
+    .container {
+        max-width: 900px;
+        padding: var(--spacing-lg);
+    }
 }
 
 /* Header */
@@ -41,38 +61,57 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
-    padding: 20px 0;
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md); /* Ajustado */
     border-bottom: 1px solid #333;
 }
-
 .header h1 {
-    color: var(--text);
-    font-size: 1.8rem;
-    font-weight: 700;
+    font-size: 1.6rem; /* Ajustado */
+    font-weight: 600; /* Mais leve */
 }
 
 /* Cards */
 .card {
     background: var(--card-bg);
-    padding: 25px;
+    padding: var(--spacing-lg);
     border-radius: 15px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    margin-bottom: var(--spacing-md);
     border: 1px solid #444;
 }
-
 .card h3 {
-    color: var(--text);
-    margin-bottom: 20px;
-    font-size: 1.2rem;
-    font-weight: 600;
+    margin-bottom: var(--spacing-md);
+    font-size: 1.1rem; /* Ajustado */
+    font-weight: 500;
 }
 
-/* Forms */
+/* Forms (Inputs) */
 .input-group {
     position: relative;
-    margin-bottom: 20px;
+    margin-bottom: var(--spacing-md);
+}
+.input-group input,
+.input-group select {
+    width: 100%;
+    /* 5. Inputs mais "tocáveis" */
+    padding: 16px 20px 16px 45px;
+    background: var(--input-bg);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 1rem; /* Tamanho de fonte padrão */
+    transition: all 0.3s ease;
+    -webkit-appearance: none;
+    appearance: none;
+}
+.input-group input:focus,
+.input-group select:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: #444;
+}
+.input-group input::placeholder {
+    color: var(--text-secondary);
 }
 
 .input-icon {
@@ -84,82 +123,91 @@ body {
     font-size: 16px;
     z-index: 2;
 }
-
-.input-group input {
-    width: 100%;
-    padding: 15px 15px 15px 45px;
-    background: var(--input-bg);
-    border: 2px solid transparent;
-    border-radius: 12px;
-    color: var(--text);
-    font-size: 14px;
-    transition: all 0.3s ease;
-}
-
-.input-group input:focus {
-    outline: none;
-    border-color: var(--accent);
-    background: #444;
-    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
-}
-
 .input-group input[data-status="error"] { border-color: var(--danger); }
 .input-group input[data-status="success"] { border-color: var(--success); }
 
-/* Buttons */
+
+/* =========================== */
+/* 6. BOTÕES MODERNOS (O FOCO) */
+/* =========================== */
 .btn {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
     width: 100%;
-    padding: 15px;
-    border: none;
+    /* 7. Altura de toque ideal (padrão mobile) */
+    min-height: 52px;
+    padding: 12px var(--spacing-md);
+    border: 2px solid transparent; /* Borda para todos */
     border-radius: 12px;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 1rem;
+    font-weight: 600; /* Peso de botão */
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease-in-out;
     text-decoration: none;
 }
 
+/* Botão Primário (Ação Principal) */
 .btn-primary {
     background: var(--accent);
     color: var(--primary);
+    border-color: var(--accent);
 }
 .btn-primary:hover {
     background: var(--accent-hover);
+    border-color: var(--accent-hover);
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
 }
-.btn-barbeiro {
-    background: linear-gradient(45deg, #8B4513, #D2691E);
-    color: white;
+/* 8. Feedback de "toque" */
+.btn-primary:active {
+    transform: translateY(0);
+    filter: brightness(0.9);
 }
-.btn-barbeiro:hover {
-    background: linear-gradient(45deg, #654321, #8B4513);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(139, 69, 19, 0.4);
-}
+
+/* Botão Secundário (Estilo "Outline") */
 .btn-secondary {
-    background: var(--card-bg);
+    background: transparent;
     color: var(--text);
-    border: 1px solid #444;
+    border-color: #555; /* Borda sutil */
 }
 .btn-secondary:hover {
     background: #3a3a3a;
-    border-color: #555;
+    border-color: #777;
+}
+.btn-secondary:active {
+    filter: brightness(0.9);
 }
 
-/* Actions */
-.actions {
-    margin: 25px 0;
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
+/* Botão Barbeiro (Mantido) */
+.btn-barbeiro {
+    background: linear-gradient(45deg, #8B4513, #D2691E);
+    color: white;
+    border: none;
 }
-.actions .btn {
-    width: auto;
-    flex: 1;
-    min-width: 150px;
+.btn-barbeiro:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(139, 69, 19, 0.4);
+}
+
+/* Ações (Mobile-First) */
+.actions {
+    margin: var(--spacing-lg) 0;
+    display: flex;
+    /* 9. Empilhado por padrão (mobile) */
+    flex-direction: column; 
+    gap: var(--spacing-md);
+}
+
+/* Em telas maiores, fica lado a lado */
+@media (min-width: 768px) {
+    .actions {
+        flex-direction: row;
+    }
+    .actions .btn {
+        width: auto;
+        flex: 1;
+        min-width: 150px;
+    }
 }
