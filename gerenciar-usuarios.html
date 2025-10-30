@@ -12,52 +12,7 @@
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/dashboard.css">
     
-    <style>
-        .management-list { max-height: 400px; overflow-y: auto; }
-        .list-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid #444;
-        }
-        .list-item-info { flex: 1; }
-        .list-item-info h4 { margin-bottom: 5px; }
-        .list-item-info p { font-size: 0.85rem; color: var(--text-secondary); }
-        .btn-delete {
-            background: var(--danger);
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
-        .btn-delete:hover { background: #c0392b; }
-        
-        /* ATUALIZADO: Mobile-First (Padrão) */
-        .form-cadastro { 
-            display: grid; 
-            grid-template-columns: 1fr; /* 1 coluna por padrão */
-            gap: 15px; 
-        }
-        
-        /* Em telas maiores, usamos 2 colunas */
-        @media (min-width: 768px) {
-            .form-cadastro { grid-template-columns: 1fr 1fr; }
-            
-            .form-cadastro .btn {
-                /* Faz o botão ocupar as 2 colunas */
-                grid-column: span 2;
-            }
-
-            /* Garante que o input de senha ocupe 2 colunas no desktop */
-            #adminSenhaCliente {
-                 grid-column: span 2;
-            }
-        }
-    </style>
-</head>
+    </head>
 <body id="gerenciamento-page">
     <div class="container" id="managementPage">
         <div class="header">

@@ -203,7 +203,20 @@ body#relatorios-page .stat-number { font-size: 1.5rem; }
 }
 
 /* ================================================ */
-/* NOVOS ESTILOS - GESTÃO DE AGENDAMENTOS */
+/* CORREÇÃO FILTRO (PÁGINA RELATÓRIOS) (NOVO) */
+/* ================================================ */
+/* Garante que o botão "Aplicar" no filtro fique alinhado */
+#filterCard .btn {
+    width: auto;
+    min-height: 46px; /* Mesma altura dos inputs */
+    height: 46px;     /* Força a altura */
+    margin-top: 0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+/* ================================================ */
+/* NOVOS ESTILOS - GESTÃO DE AGENDAMENTOS (CORRIGIDO) */
 /* ================================================ */
 .agendamento-actions {
     display: flex;
@@ -211,25 +224,12 @@ body#relatorios-page .stat-number { font-size: 1.5rem; }
     gap: 8px;
     align-items: flex-end;
 }
-.btn-confirm, .btn-cancel {
-    border: none;
-    padding: 6px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.8rem;
-    font-weight: 600;
-    transition: all 0.2s ease;
-}
-.btn-confirm {
-    background: var(--success);
-    color: white;
-}
-.btn-confirm:hover { background: #229954; }
-.btn-cancel {
-    background: var(--danger);
-    color: white;
-}
-.btn-cancel:hover { background: #c0392b; }
+/*
+   Os estilos .btn-confirm e .btn-cancel
+   FORAM REMOVIDOS DAQUI.
+   Eles agora são tratados por .btn, .btn-success, .btn-danger, .btn-sm
+   no arquivo base.css e no HTML/JS.
+*/
 
 @media (min-width: 768px) {
     .agendamento-actions {

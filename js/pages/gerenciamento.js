@@ -119,7 +119,7 @@ async function loadManagementLists() {
                 <p>CPF: ${user.cpf} | Email: ${user.email}</p>
                 <p>Pontos: ${user.pontos} | Cortes Grátis: ${user.cortes_gratis || 0} | Total Cortes: ${cortesPorCliente[user.id] || 0}</p>
             </div>
-            <button class="btn-delete" data-id="${user.id}" data-tipo="user">Excluir</button>
+            <button class="btn btn-danger btn-sm" data-id="${user.id}" data-tipo="user">Excluir</button>
         `;
         listaClientes.appendChild(item);
     });
@@ -135,7 +135,7 @@ async function loadManagementLists() {
                 <h4>${barb.nome}</h4>
                 <p>CPF: ${barb.cpf || 'N/A'} | Email: ${barb.email}</p>
             </div>
-            <button class="btn-delete" data-id="${barb.id}" data-tipo="barbeiro">Excluir</button>
+            <button class="btn btn-danger btn-sm" data-id="${barb.id}" data-tipo="barbeiro">Excluir</button>
         `;
         listaBarbeiros.appendChild(item);
     });

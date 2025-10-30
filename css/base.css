@@ -211,3 +211,46 @@ body {
         min-width: 150px;
     }
 }
+
+/* =========================== */
+/* 7. BOTÕES ADICIONAIS (NOVOS) */
+/* =========================== */
+
+/* Botão de Sucesso (Verde) */
+.btn-success {
+    background: var(--success);
+    color: var(--text);
+    border-color: var(--success);
+}
+.btn-success:hover {
+    background: #229954; /* Mais escuro que --success */
+    border-color: #229954;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(39, 174, 96, 0.3);
+}
+
+/* Botão de Perigo (Vermelho) */
+.btn-danger {
+    background: var(--danger);
+    color: var(--text);
+    border-color: var(--danger);
+}
+.btn-danger:hover {
+    background: #c0392b; /* Mais escuro que --danger */
+    border-color: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(231, 76, 60, 0.3);
+}
+
+/* =========================== */
+/* 8. MODIFICADORES DE BOTÃO (NOVOS) */
+/* =========================== */
+
+/* Botão Pequeno (para listas e ações secundárias) */
+.btn-sm {
+    min-height: auto;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 8px;
+}

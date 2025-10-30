@@ -174,14 +174,16 @@ function carregarAgendamentosBarbeiro(agendamentos) {
             
             const div = document.createElement('div');
             div.className = 'cliente-item'; // Reutiliza o estilo
+            
+            // BOTÕES ATUALIZADOS AQUI
             div.innerHTML = `
                 <div class="cliente-info">
                     <h4>${hora} - ${clienteNome}</h4>
                     <p>Status: ${agendamento.status}</p>
                 </div>
                 <div class="agendamento-actions">
-                    <button class="btn-confirm" data-id="${agendamento.id}">Confirmar</button>
-                    <button class="btn-cancel" data-id="${agendamento.id}">Cancelar</button>
+                    <button class="btn btn-success btn-sm" data-id="${agendamento.id}">Confirmar</button>
+                    <button class="btn btn-danger btn-sm" data-id="${agendamento.id}">Cancelar</button>
                 </div>
             `;
             container.appendChild(div);
@@ -241,10 +243,10 @@ async function handleAgendamentoActions(e) {
     let novoStatus = null;
     let acao = null;
 
-    if (target.classList.contains('btn-confirm')) {
+    if (target.classList.contains('btn-success')) { // ATUALIZADO de btn-confirm
         novoStatus = 'concluido';
         acao = 'confirmar';
-    } else if (target.classList.contains('btn-cancel')) {
+    } else if (target.classList.contains('btn-danger')) { // ATUALIZADO de btn-cancel
         novoStatus = 'cancelado';
         acao = 'cancelar';
     }
